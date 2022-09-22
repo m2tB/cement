@@ -1,3 +1,0 @@
-consul:
-  address: 10.41.15.19:8500
-  scheme: http
