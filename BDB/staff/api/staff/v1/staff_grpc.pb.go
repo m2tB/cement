@@ -27,7 +27,6 @@ type StaffClient interface {
 	DeleteStaff(ctx context.Context, in *DeleteStaffRequest, opts ...grpc.CallOption) (*DeleteStaffReply, error)
 	RecoveryStaff(ctx context.Context, in *RecoveryStaffRequest, opts ...grpc.CallOption) (*RecoveryStaffReply, error)
 	ListStaff(ctx context.Context, in *ListStaffRequest, opts ...grpc.CallOption) (*ListStaffReply, error)
-	VerifyStaff(ctx context.Context, in *VerifyStaffRequest, opts ...grpc.CallOption) (*VerifyStaffReply, error)
 }
 
 type staffClient struct {
@@ -83,15 +82,6 @@ func (c *staffClient) ListStaff(ctx context.Context, in *ListStaffRequest, opts 
 	return out, nil
 }
 
-func (c *staffClient) VerifyStaff(ctx context.Context, in *VerifyStaffRequest, opts ...grpc.CallOption) (*VerifyStaffReply, error) {
-	out := new(VerifyStaffReply)
-	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/VerifyStaff", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // StaffServer is the server API for Staff service.
 // All implementations must embed UnimplementedStaffServer
 // for forward compatibility
@@ -101,7 +91,6 @@ type StaffServer interface {
 	DeleteStaff(context.Context, *DeleteStaffRequest) (*DeleteStaffReply, error)
 	RecoveryStaff(context.Context, *RecoveryStaffRequest) (*RecoveryStaffReply, error)
 	ListStaff(context.Context, *ListStaffRequest) (*ListStaffReply, error)
-	VerifyStaff(context.Context, *VerifyStaffRequest) (*VerifyStaffReply, error)
 	mustEmbedUnimplementedStaffServer()
 }
 
@@ -123,9 +112,6 @@ func (UnimplementedStaffServer) RecoveryStaff(context.Context, *RecoveryStaffReq
 }
 func (UnimplementedStaffServer) ListStaff(context.Context, *ListStaffRequest) (*ListStaffReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListStaff not implemented")
-}
-func (UnimplementedStaffServer) VerifyStaff(context.Context, *VerifyStaffRequest) (*VerifyStaffReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyStaff not implemented")
 }
 func (UnimplementedStaffServer) mustEmbedUnimplementedStaffServer() {}
 
@@ -230,24 +216,6 @@ func _Staff_ListStaff_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Staff_VerifyStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyStaffRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StaffServer).VerifyStaff(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/api.staff.v1.Staff/VerifyStaff",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffServer).VerifyStaff(ctx, req.(*VerifyStaffRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Staff_ServiceDesc is the grpc.ServiceDesc for Staff service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,10 +242,6 @@ var Staff_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStaff",
 			Handler:    _Staff_ListStaff_Handler,
-		},
-		{
-			MethodName: "VerifyStaff",
-			Handler:    _Staff_VerifyStaff_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

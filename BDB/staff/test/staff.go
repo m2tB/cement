@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	v1 "staff/api/staff/v1"
-	"staff/api/staff/v1/generate"
 	"time"
 )
 
@@ -33,7 +32,7 @@ func Init() {
 }
 
 func TestCreateStaff() {
-	rsp, err := staffClient.CreateStaff(context.Background(), &generate.CreateStaffRequest{
+	rsp, err := staffClient.CreateStaff(context.Background(), &v1.CreateStaffRequest{
 		Mobile: fmt.Sprintf("1388888%d%d", time.Now().Minute(), time.Now().Second()),
 		Name:   fmt.Sprintf("YWWW%d", 1),
 	})
@@ -43,8 +42,8 @@ func TestCreateStaff() {
 	fmt.Println(rsp.Exec)
 }
 
-func TestListStaff() *generate.StaffReply {
-	rsp, err := staffClient.ListStaff(context.Background(), &generate.ListStaffRequest{})
+func TestListStaff() *v1.StaffReply {
+	rsp, err := staffClient.ListStaff(context.Background(), &v1.ListStaffRequest{})
 	if err != nil {
 		panic("grpc 获取用户列表失败" + err.Error())
 	}
@@ -52,21 +51,21 @@ func TestListStaff() *generate.StaffReply {
 	return rsp.Data[0]
 }
 
-func TestUpdateStaff(s *generate.StaffReply) {
+func TestUpdateStaff(s *v1.StaffReply) {
 	fmt.Println(s.Id)
-	rsp, err := staffClient.UpdateStaff(context.Background(), &generate.UpdateStaffRequest{
+	rsp, err := staffClient.UpdateStaff(context.Background(), &v1.UpdateStaffRequest{
 		Id:   s.Id,
-		Name: fmt.Sprintf("YWWW%d", 2),
+		Name: fmt.Sprintf("YWWW%d", 22344),
 	})
 	if err != nil {
 		panic("grpc 更新用户失败" + err.Error())
 	}
-	fmt.Println(rsp.Exec)
+	fmt.Println(rsp)
 }
 
-func TestDeleteStaff(s *generate.StaffReply) {
+func TestDeleteStaff(s *v1.StaffReply) {
 	fmt.Println(s.Id)
-	rsp, err := staffClient.DeleteStaff(context.Background(), &generate.DeleteStaffRequest{
+	rsp, err := staffClient.DeleteStaff(context.Background(), &v1.DeleteStaffRequest{
 		Id: s.Id,
 	})
 	if err != nil {
@@ -75,9 +74,9 @@ func TestDeleteStaff(s *generate.StaffReply) {
 	fmt.Println(rsp.Exec)
 }
 
-func TestRecoveryStaff(s *generate.StaffReply) {
+func TestRecoveryStaff(s *v1.StaffReply) {
 	fmt.Println(s.Id)
-	rsp, err := staffClient.RecoveryStaff(context.Background(), &generate.RecoveryStaffRequest{
+	rsp, err := staffClient.RecoveryStaff(context.Background(), &v1.RecoveryStaffRequest{
 		Id: s.Id,
 	})
 	if err != nil {

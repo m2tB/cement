@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
@@ -17,7 +16,7 @@ import (
 type Staff struct {
 	ID        int64      `gorm:"primaryKey"`
 	Mobile    string     `gorm:"index:idx_mobile;unique;type:varchar(11) comment '手机号码,用户唯一标识';not null"`
-	Name      string     `gorm:"type:varchar(25) comment '用户昵称';not null"`
+	Name      string     `gorm:"type:varchar(4) comment '用户昵称';not null"`
 	CreatedAt *time.Time `gorm:"column:created_at"`
 	UpdatedAt *time.Time `gorm:"column:updated_at"`
 	IsDeleted int        `gorm:"column:is_deleted"`
@@ -131,27 +130,4 @@ func paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
-}
-
-func (r *staffRepo) Verify(ctx context.Context, s *biz.Staff) (bool, error) {
-	// 拦截,防止重复发送验证码
-	key := constant.VerifyPrefix + s.Mobile
-	_, err := r.data.rdb.Get(ctx, key).Result()
-	if err != redis.Nil {
-		return false, err
-	}
-	var total int64
-	// 验证是否存在
-	r.data.db.Model(&Staff{}).Where("mobile = ? and is_deleted = ?", s.Mobile, constant.False).Count(&total)
-	if total == 0 {
-		return false, status.Errorf(codes.NotFound, "access is not exist.")
-	}
-	// TODO 发送短信
-	//code := fmt.Sprintf("%d", uuid.New().ID())[:6]
-	code := "378283"
-	_, err = r.data.rdb.Set(ctx, key, code, time.Minute).Result()
-	if err != nil {
-		return false, status.Errorf(codes.Unknown, "redis occur something wrong.")
-	}
-	return true, nil
 }

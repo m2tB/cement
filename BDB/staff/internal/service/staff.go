@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
-	"staff/api/staff/v1/generate"
 	"staff/constant"
 	"staff/internal/biz"
 
@@ -21,7 +20,7 @@ func NewStaffService(uc *biz.StaffUsecase, logger log.Logger) *StaffService {
 	return &StaffService{uc: uc, log: log.NewHelper(logger)}
 }
 
-func (s *StaffService) CreateStaff(ctx context.Context, req *generate.CreateStaffRequest) (*generate.CreateStaffReply, error) {
+func (s *StaffService) CreateStaff(ctx context.Context, req *v1.CreateStaffRequest) (*v1.CreateStaffReply, error) {
 	_, err := s.uc.CreateStaff(ctx, &biz.Staff{
 		Mobile: req.Mobile,
 		Name:   req.Name,
@@ -29,13 +28,13 @@ func (s *StaffService) CreateStaff(ctx context.Context, req *generate.CreateStaf
 	if err != nil {
 		return nil, err
 	}
-	createStaffReply := generate.CreateStaffReply{
+	createStaffReply := v1.CreateStaffReply{
 		Exec: true,
 	}
 	return &createStaffReply, nil
 }
 
-func (s *StaffService) UpdateStaff(ctx context.Context, req *generate.UpdateStaffRequest) (*generate.UpdateStaffReply, error) {
+func (s *StaffService) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
 	_, err := s.uc.UpdateStaff(ctx, &biz.Staff{
 		ID:     req.Id,
 		Mobile: req.Mobile,
@@ -44,13 +43,13 @@ func (s *StaffService) UpdateStaff(ctx context.Context, req *generate.UpdateStaf
 	if err != nil {
 		return nil, err
 	}
-	updateStaffReply := generate.UpdateStaffReply{
+	updateStaffReply := v1.UpdateStaffReply{
 		Exec: true,
 	}
 	return &updateStaffReply, nil
 }
 
-func (s *StaffService) DeleteStaff(ctx context.Context, req *generate.DeleteStaffRequest) (*generate.DeleteStaffReply, error) {
+func (s *StaffService) DeleteStaff(ctx context.Context, req *v1.DeleteStaffRequest) (*v1.DeleteStaffReply, error) {
 	_, err := s.uc.DeleteStaff(ctx, &biz.Staff{
 		ID:        req.Id,
 		IsDeleted: constant.True,
@@ -58,13 +57,13 @@ func (s *StaffService) DeleteStaff(ctx context.Context, req *generate.DeleteStaf
 	if err != nil {
 		return nil, err
 	}
-	deleteStaffReply := generate.DeleteStaffReply{
+	deleteStaffReply := v1.DeleteStaffReply{
 		Exec: true,
 	}
 	return &deleteStaffReply, nil
 }
 
-func (s *StaffService) RecoveryStaff(ctx context.Context, req *generate.RecoveryStaffRequest) (*generate.RecoveryStaffReply, error) {
+func (s *StaffService) RecoveryStaff(ctx context.Context, req *v1.RecoveryStaffRequest) (*v1.RecoveryStaffReply, error) {
 	_, err := s.uc.DeleteStaff(ctx, &biz.Staff{
 		ID:        req.Id,
 		IsDeleted: constant.False,
@@ -72,13 +71,13 @@ func (s *StaffService) RecoveryStaff(ctx context.Context, req *generate.Recovery
 	if err != nil {
 		return nil, err
 	}
-	recoveryStaffReply := generate.RecoveryStaffReply{
+	recoveryStaffReply := v1.RecoveryStaffReply{
 		Exec: true,
 	}
 	return &recoveryStaffReply, nil
 }
 
-func (s *StaffService) ListStaff(ctx context.Context, req *generate.ListStaffRequest) (*generate.ListStaffReply, error) {
+func (s *StaffService) ListStaff(ctx context.Context, req *v1.ListStaffRequest) (*v1.ListStaffReply, error) {
 	// 类型转换 int -> bool
 	isDeleted := constant.False
 	if req.IsDeleted {
@@ -92,10 +91,10 @@ func (s *StaffService) ListStaff(ctx context.Context, req *generate.ListStaffReq
 	if err != nil {
 		return nil, err
 	}
-	rsp := &generate.ListStaffReply{}
+	rsp := &v1.ListStaffReply{}
 	rsp.Total = int32(total)
 	for _, staff := range list {
-		staffInfoRsp := generate.StaffReply{
+		staffInfoRsp := v1.StaffReply{
 			Id:        staff.ID,
 			Name:      staff.Name,
 			Mobile:    staff.Mobile,
@@ -106,17 +105,4 @@ func (s *StaffService) ListStaff(ctx context.Context, req *generate.ListStaffReq
 	}
 
 	return rsp, nil
-}
-
-func (s *StaffService) VerifyStaff(ctx context.Context, req *generate.VerifyStaffRequest) (*generate.VerifyStaffReply, error) {
-	_, err := s.uc.VerifyStaff(ctx, &biz.Staff{
-		Mobile: req.Mobile,
-	})
-	if err != nil {
-		return nil, err
-	}
-	verifyStaffReply := generate.VerifyStaffReply{
-		Exec: true,
-	}
-	return &verifyStaffReply, nil
 }

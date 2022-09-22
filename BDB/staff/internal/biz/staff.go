@@ -24,8 +24,6 @@ type StaffRepo interface {
 	Delete(context.Context, *Staff) (bool, error)
 
 	List(context.Context, *Staff, int, int) ([]*Staff, int64, error)
-
-	Verify(context.Context, *Staff) (bool, error)
 }
 
 // StaffUsecase is a Staff usecase.
@@ -57,9 +55,4 @@ func (uc *StaffUsecase) DeleteStaff(ctx context.Context, s *Staff) (bool, error)
 // ListStaff returns the Staff List.
 func (uc *StaffUsecase) ListStaff(ctx context.Context, s *Staff, pn int, pSize int) ([]*Staff, int64, error) {
 	return uc.repo.List(ctx, s, pn, pSize)
-}
-
-// VerifyStaff verify a Staff when login, and returns the exec result.
-func (uc *StaffUsecase) VerifyStaff(ctx context.Context, s *Staff) (bool, error) {
-	return uc.repo.Verify(ctx, s)
 }

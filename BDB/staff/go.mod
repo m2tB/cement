@@ -3,6 +3,7 @@ module staff
 go 1.17
 
 require (
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/go-kratos/kratos/contrib/registry/consul/v2 v2.0.0-20220919023954-9737a3c5e434
 	github.com/go-kratos/kratos/v2 v2.5.0
 	github.com/go-redis/redis/extra/redisotel v0.3.0
@@ -10,7 +11,7 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/consul/api v1.14.0
 	google.golang.org/grpc v1.46.2
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/mysql v1.3.6
 	gorm.io/gorm v1.23.9
 )

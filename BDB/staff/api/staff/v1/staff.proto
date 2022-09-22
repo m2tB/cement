@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package api.staff.v1;
 
+import "validate/validate.proto";
+
 option go_package = "staff/api/staff/v1;v1";
 
 service Staff {
@@ -12,38 +14,35 @@ service Staff {
 	rpc RecoveryStaff (RecoveryStaffRequest) returns (RecoveryStaffReply);
 
 	rpc ListStaff (ListStaffRequest) returns (ListStaffReply);
-
-	rpc VerifyStaff (VerifyStaffRequest) returns (VerifyStaffReply);
 }
 
 // 创建Staff请求接口参数
 message CreateStaffRequest {
-	string mobile = 1;
-	string name = 2;
-	string code = 3;
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"];
+	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}];
 }
 message CreateStaffReply {
 	bool exec = 1;
 }
 
 message UpdateStaffRequest {
-	int64 id = 1;
-	string mobile = 2;
-	string name = 3;
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+	string mobile = 2 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"];
+	string name = 3 [(validate.rules).string = {min_len: 1, max_len: 4}];
 }
 message UpdateStaffReply {
 	bool exec = 1;
 }
 
 message DeleteStaffRequest {
-	int64 id = 1;
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
 }
 message DeleteStaffReply {
 	bool exec = 1;
 }
 
 message RecoveryStaffRequest {
-	int64 id = 1;
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
 }
 message RecoveryStaffReply {
 	bool exec = 1;
@@ -66,11 +65,4 @@ message StaffReply {
 	string name = 3;
 	string createdAt = 4;
 	string updatedAt = 5;
-}
-
-message VerifyStaffRequest {
-	string mobile = 1;
-}
-message VerifyStaffReply {
-	bool exec = 1;
 }
