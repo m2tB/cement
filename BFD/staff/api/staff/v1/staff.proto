@@ -10,9 +10,7 @@ service Staff {
 	rpc CreateStaff (CreateStaffRequest) returns (CreateStaffReply);
 	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply);
 	rpc DeleteStaff (DeleteStaffRequest) returns (DeleteStaffReply);
-
 	rpc RecoveryStaff (RecoveryStaffRequest) returns (RecoveryStaffReply);
-
 	rpc ListStaff (ListStaffRequest) returns (ListStaffReply);
 }
 
