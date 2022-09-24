@@ -28,7 +28,9 @@ func wireApp(confServer *conf.Server, confData *conf.Data, registry *conf.Regist
 	}
 	staffRepo := data.NewStaffRepo(dataData, logger)
 	staffUsecase := biz.NewStaffUsecase(staffRepo, logger)
-	staffService := service.NewStaffService(staffUsecase, logger)
+	teamRepo := data.NewTeamRepo(dataData, logger)
+	teamUsecase := biz.NewTeamUsecase(teamRepo, logger)
+	staffService := service.NewStaffService(staffUsecase, teamUsecase, logger)
 	grpcServer := server.NewGRPCServer(confServer, staffService, logger)
 	registrar := server.NewRegistrar(registry)
 	app := newApp(logger, grpcServer, registrar)

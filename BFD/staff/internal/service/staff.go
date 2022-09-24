@@ -2,26 +2,14 @@ package service
 
 import (
 	"context"
-	"github.com/go-kratos/kratos/v2/log"
 	"staff/constant"
 	"staff/internal/biz"
 
 	v1 "staff/api/staff/v1"
 )
 
-type StaffService struct {
-	v1.UnimplementedStaffServer
-
-	uc  *biz.StaffUsecase
-	log *log.Helper
-}
-
-func NewStaffService(uc *biz.StaffUsecase, logger log.Logger) *StaffService {
-	return &StaffService{uc: uc, log: log.NewHelper(logger)}
-}
-
 func (s *StaffService) CreateStaff(ctx context.Context, req *v1.CreateStaffRequest) (*v1.CreateStaffReply, error) {
-	_, err := s.uc.CreateStaff(ctx, &biz.Staff{
+	_, err := s.staff.CreateStaff(ctx, &biz.Staff{
 		Mobile: req.Mobile,
 		Name:   req.Name,
 	})
@@ -35,7 +23,7 @@ func (s *StaffService) CreateStaff(ctx context.Context, req *v1.CreateStaffReque
 }
 
 func (s *StaffService) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
-	_, err := s.uc.UpdateStaff(ctx, &biz.Staff{
+	_, err := s.staff.UpdateStaff(ctx, &biz.Staff{
 		ID:     req.Id,
 		Mobile: req.Mobile,
 		Name:   req.Name,
@@ -50,7 +38,7 @@ func (s *StaffService) UpdateStaff(ctx context.Context, req *v1.UpdateStaffReque
 }
 
 func (s *StaffService) DeleteStaff(ctx context.Context, req *v1.DeleteStaffRequest) (*v1.DeleteStaffReply, error) {
-	_, err := s.uc.DeleteStaff(ctx, &biz.Staff{
+	_, err := s.staff.DeleteStaff(ctx, &biz.Staff{
 		ID:        req.Id,
 		IsDeleted: constant.True,
 	})
@@ -64,7 +52,7 @@ func (s *StaffService) DeleteStaff(ctx context.Context, req *v1.DeleteStaffReque
 }
 
 func (s *StaffService) RecoveryStaff(ctx context.Context, req *v1.RecoveryStaffRequest) (*v1.RecoveryStaffReply, error) {
-	_, err := s.uc.DeleteStaff(ctx, &biz.Staff{
+	_, err := s.staff.DeleteStaff(ctx, &biz.Staff{
 		ID:        req.Id,
 		IsDeleted: constant.False,
 	})
@@ -83,7 +71,7 @@ func (s *StaffService) ListStaff(ctx context.Context, req *v1.ListStaffRequest) 
 	if req.IsDeleted {
 		isDeleted = constant.True
 	}
-	list, total, err := s.uc.ListStaff(ctx, &biz.Staff{
+	list, total, err := s.staff.ListStaff(ctx, &biz.Staff{
 		Mobile:    req.Mobile,
 		Name:      req.Name,
 		IsDeleted: isDeleted,

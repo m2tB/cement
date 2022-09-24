@@ -34,7 +34,7 @@ type StaffUsecase struct {
 
 // NewStaffUsecase new a Staff usecase.
 func NewStaffUsecase(repo StaffRepo, logger log.Logger) *StaffUsecase {
-	return &StaffUsecase{repo: repo, log: log.NewHelper(logger)}
+	return &StaffUsecase{repo: repo, log: log.NewHelper(log.With(logger, "module", "usecase/staff"))}
 }
 
 // CreateStaff creates a Staff, and returns the exec result.

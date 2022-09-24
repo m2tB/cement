@@ -4,22 +4,20 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"staff/api/staff/v1"
+	v1 "staff/api/staff/v1"
 	"staff/internal/conf"
 	"staff/internal/service"
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, staff *service.StaffService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, s *service.StaffService, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
 			logging.Server(logger),
 			validate.Validator(),
-			tracing.Server(),
 		),
 	}
 	if c.Grpc.Network != "" {
@@ -32,6 +30,6 @@ func NewGRPCServer(c *conf.Server, staff *service.StaffService, logger log.Logge
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterStaffServer(srv, staff)
+	v1.RegisterStaffServer(srv, s)
 	return srv
 }

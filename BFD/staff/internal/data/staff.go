@@ -4,7 +4,6 @@ import (
 	"context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 	"staff/constant"
 	"time"
 
@@ -113,21 +112,4 @@ func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]
 		})
 	}
 	return result, total, nil
-}
-
-// paginate 分页参数调整
-func paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if page == 0 {
-			page = 1
-		}
-		switch {
-		case pageSize > 100:
-			pageSize = 100
-		case pageSize <= 0:
-			pageSize = 10
-		}
-		offset := (page - 1) * pageSize
-		return db.Offset(offset).Limit(pageSize)
-	}
 }

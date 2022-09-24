@@ -7,26 +7,35 @@ import "validate/validate.proto";
 option go_package = "staff/api/staff/v1;v1";
 
 service Staff {
+	// staff相关接口
 	rpc CreateStaff (CreateStaffRequest) returns (CreateStaffReply);
 	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply);
 	rpc DeleteStaff (DeleteStaffRequest) returns (DeleteStaffReply);
 	rpc RecoveryStaff (RecoveryStaffRequest) returns (RecoveryStaffReply);
 	rpc ListStaff (ListStaffRequest) returns (ListStaffReply);
+
+	// team相关接口
+	rpc CreateTeam (CreateTeamRequest) returns (CreateTeamReply);
+	rpc UpdateTeam (UpdateTeamRequest) returns (UpdateTeamReply);
+	rpc DeleteTeam (DeleteTeamRequest) returns (DeleteTeamReply);
+	rpc ListTeam (ListTeamRequest) returns (ListTeamReply);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 // 创建Staff请求接口参数
 message CreateStaffRequest {
-	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"];
-	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}];
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
+	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}]; // 员工姓名
 }
 message CreateStaffReply {
-	bool exec = 1;
+	bool exec = 1; // 执行结果
 }
 
 message UpdateStaffRequest {
 	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
-	string mobile = 2 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"];
-	string name = 3 [(validate.rules).string = {min_len: 1, max_len: 4}];
+	string mobile = 2 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
+	string name = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
 }
 message UpdateStaffReply {
 	bool exec = 1;
@@ -47,10 +56,10 @@ message RecoveryStaffReply {
 }
 
 message ListStaffRequest {
-	int32 pn = 1;
-	int32 pSize = 2;
-	string mobile = 3;
-	string name = 4;
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	string mobile = 3 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
+	string name = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
 	bool isDeleted = 5;
 }
 message ListStaffReply {
@@ -63,4 +72,52 @@ message StaffReply {
 	string name = 3;
 	string createdAt = 4;
 	string updatedAt = 5;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+message CreateTeamRequest {
+	string cName = 1 [(validate.rules).string = {min_len: 1, max_len: 32}]; // team中文名称
+	string eName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}]; // team英文名称
+	string preTeamCode = 3 [(validate.rules).string = {min_len: 1, max_len: 4}]; // team前置代码 - 用于成员工号生成
+}
+message CreateTeamReply {
+	bool exec = 1;
+}
+
+message UpdateTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+	string cName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
+	string eName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
+	string preTeamCode = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+}
+message UpdateTeamReply {
+	bool exec = 1;
+}
+
+message DeleteTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message DeleteTeamReply {
+	bool exec = 1;
+}
+
+message ListTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	string cName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
+	string eName = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
+	string preTeamCode = 5 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+}
+message ListTeamReply {
+	int32 total = 1;
+	repeated TeamReply data = 2;
+}
+message TeamReply {
+	int64 id = 1;
+	string cName = 2;
+	string eName = 3;
+	string preTeamCode = 4;
+	string createdAt = 5;
+	string updatedAt = 6;
 }
