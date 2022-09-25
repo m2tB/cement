@@ -11,6 +11,7 @@ service Staff {
 	rpc CreateStaff (CreateStaffRequest) returns (CreateStaffReply);
 	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply);
 	rpc DeleteStaff (DeleteStaffRequest) returns (DeleteStaffReply);
+	rpc ReadStaff (ReadStaffRequest) returns (ReadStaffReply);
 	rpc RecoveryStaff (RecoveryStaffRequest) returns (RecoveryStaffReply);
 	rpc ListStaff (ListStaffRequest) returns (ListStaffReply);
 
@@ -18,6 +19,7 @@ service Staff {
 	rpc CreateTeam (CreateTeamRequest) returns (CreateTeamReply);
 	rpc UpdateTeam (UpdateTeamRequest) returns (UpdateTeamReply);
 	rpc DeleteTeam (DeleteTeamRequest) returns (DeleteTeamReply);
+	rpc ReadTeam (ReadTeamRequest) returns (ReadTeamReply);
 	rpc ListTeam (ListTeamRequest) returns (ListTeamReply);
 }
 
@@ -46,6 +48,13 @@ message DeleteStaffRequest {
 }
 message DeleteStaffReply {
 	bool exec = 1;
+}
+
+message ReadStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message ReadStaffReply {
+	StaffReply staff = 1;
 }
 
 message RecoveryStaffRequest {
@@ -102,6 +111,13 @@ message DeleteTeamReply {
 	bool exec = 1;
 }
 
+message ReadTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message ReadTeamReply {
+	TeamReply team = 1;
+}
+
 message ListTeamRequest {
 	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
 	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
@@ -121,3 +137,5 @@ message TeamReply {
 	string createdAt = 5;
 	string updatedAt = 6;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------

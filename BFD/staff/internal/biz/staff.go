@@ -22,6 +22,7 @@ type StaffRepo interface {
 	Save(context.Context, *Staff) (bool, error)
 	Update(context.Context, *Staff) (bool, error)
 	Delete(context.Context, *Staff) (bool, error)
+	Read(context.Context, *Staff) (*Staff, error)
 
 	List(context.Context, *Staff, int, int) ([]*Staff, int64, error)
 }
@@ -50,6 +51,11 @@ func (uc *StaffUsecase) UpdateStaff(ctx context.Context, s *Staff) (bool, error)
 // DeleteStaff delete a Staff, and returns the exec result.
 func (uc *StaffUsecase) DeleteStaff(ctx context.Context, s *Staff) (bool, error) {
 	return uc.repo.Delete(ctx, s)
+}
+
+// ReadStaff read a Staff, and returns the result.
+func (uc *StaffUsecase) ReadStaff(ctx context.Context, s *Staff) (*Staff, error) {
+	return uc.repo.Read(ctx, s)
 }
 
 // ListStaff returns the Staff List.

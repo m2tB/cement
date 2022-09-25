@@ -23,6 +23,7 @@ type TeamRepo interface {
 	Save(context.Context, *Team) (bool, error)
 	Update(context.Context, *Team) (bool, error)
 	Delete(context.Context, *Team) (bool, error)
+	Read(context.Context, *Team) (*Team, error)
 
 	List(context.Context, *Team, int, int) ([]*Team, int64, error)
 }
@@ -51,6 +52,11 @@ func (uc *TeamUsecase) UpdateTeam(ctx context.Context, t *Team) (bool, error) {
 // DeleteTeam delete a Team, and returns the exec result.
 func (uc *TeamUsecase) DeleteTeam(ctx context.Context, t *Team) (bool, error) {
 	return uc.repo.Delete(ctx, t)
+}
+
+// ReadTeam read a Team, and returns the result.
+func (uc *TeamUsecase) ReadTeam(ctx context.Context, t *Team) (*Team, error) {
+	return uc.repo.Read(ctx, t)
 }
 
 // ListTeam returns the Team List.

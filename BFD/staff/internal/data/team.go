@@ -83,6 +83,22 @@ func (r *teamRepo) Delete(_ context.Context, t *biz.Team) (bool, error) {
 	return true, nil
 }
 
+func (r *teamRepo) Read(_ context.Context, t *biz.Team) (*biz.Team, error) {
+	var team Team
+	exec := r.data.db.Model(&Team{}).Where("id = ? and is_deleted = ?", t.ID, constant.False).First(&team)
+	if exec.Error != nil {
+		return nil, exec.Error
+	}
+	return &biz.Team{
+		ID:          team.ID,
+		CName:       team.CName,
+		EName:       team.EName,
+		PreTeamCode: team.PreTeamCode,
+		CreatedAt:   team.CreatedAt,
+		UpdatedAt:   team.UpdatedAt,
+	}, nil
+}
+
 func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*biz.Team, int64, error) {
 	var total int64
 	tx := r.data.db.Model(&Team{}).Where("is_deleted", constant.False)
@@ -101,7 +117,10 @@ func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*b
 	}
 	var teams []Team
 	result := make([]*biz.Team, 0)
-	tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&teams)
+	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&teams)
+	if exec.Error != nil {
+		return nil, 0, exec.Error
+	}
 	for _, team := range teams {
 		result = append(result, &biz.Team{
 			ID:          team.ID,

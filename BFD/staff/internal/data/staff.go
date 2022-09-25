@@ -86,6 +86,21 @@ func (r *staffRepo) Delete(_ context.Context, s *biz.Staff) (bool, error) {
 	return true, nil
 }
 
+func (r *staffRepo) Read(_ context.Context, s *biz.Staff) (*biz.Staff, error) {
+	var staff Staff
+	exec := r.data.db.Model(&Staff{}).Where("id = ? and is_deleted = ?", s.ID, constant.False).First(&staff)
+	if exec.Error != nil {
+		return nil, exec.Error
+	}
+	return &biz.Staff{
+		ID:        staff.ID,
+		Mobile:    staff.Mobile,
+		Name:      staff.Name,
+		CreatedAt: staff.CreatedAt,
+		UpdatedAt: staff.UpdatedAt,
+	}, nil
+}
+
 func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]*biz.Staff, int64, error) {
 	var total int64
 	tx := r.data.db.Model(&Staff{}).Where("is_deleted", s.IsDeleted)
@@ -101,7 +116,10 @@ func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]
 	}
 	var staffs []Staff
 	result := make([]*biz.Staff, 0)
-	tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&staffs)
+	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&staffs)
+	if exec.Error != nil {
+		return nil, 0, exec.Error
+	}
 	for _, staff := range staffs {
 		result = append(result, &biz.Staff{
 			ID:        staff.ID,

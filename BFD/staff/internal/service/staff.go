@@ -51,6 +51,25 @@ func (s *StaffService) DeleteStaff(ctx context.Context, req *v1.DeleteStaffReque
 	return &deleteStaffReply, nil
 }
 
+func (s *StaffService) ReadStaff(ctx context.Context, req *v1.ReadStaffRequest) (*v1.ReadStaffReply, error) {
+	staff, err := s.staff.ReadStaff(ctx, &biz.Staff{
+		ID: req.Id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	readStaffReply := v1.ReadStaffReply{
+		Staff: &v1.StaffReply{
+			Id:        staff.ID,
+			Name:      staff.Name,
+			Mobile:    staff.Mobile,
+			CreatedAt: staff.CreatedAt.Format(constant.CSTLayout),
+			UpdatedAt: staff.UpdatedAt.Format(constant.CSTLayout),
+		},
+	}
+	return &readStaffReply, nil
+}
+
 func (s *StaffService) RecoveryStaff(ctx context.Context, req *v1.RecoveryStaffRequest) (*v1.RecoveryStaffReply, error) {
 	_, err := s.staff.DeleteStaff(ctx, &biz.Staff{
 		ID:        req.Id,

@@ -725,6 +725,246 @@ var _ interface {
 	ErrorName() string
 } = DeleteStaffReplyValidationError{}
 
+// Validate checks the field values on ReadStaffRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ReadStaffRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReadStaffRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ReadStaffRequestMultiError, or nil if none found.
+func (m *ReadStaffRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReadStaffRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := ReadStaffRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ReadStaffRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ReadStaffRequestMultiError is an error wrapping multiple validation errors
+// returned by ReadStaffRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ReadStaffRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReadStaffRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReadStaffRequestMultiError) AllErrors() []error { return m }
+
+// ReadStaffRequestValidationError is the validation error returned by
+// ReadStaffRequest.Validate if the designated constraints aren't met.
+type ReadStaffRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReadStaffRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReadStaffRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReadStaffRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReadStaffRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReadStaffRequestValidationError) ErrorName() string { return "ReadStaffRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ReadStaffRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReadStaffRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReadStaffRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReadStaffRequestValidationError{}
+
+// Validate checks the field values on ReadStaffReply with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ReadStaffReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReadStaffReply with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ReadStaffReplyMultiError,
+// or nil if none found.
+func (m *ReadStaffReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReadStaffReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetStaff()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ReadStaffReplyValidationError{
+					field:  "Staff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ReadStaffReplyValidationError{
+					field:  "Staff",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStaff()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReadStaffReplyValidationError{
+				field:  "Staff",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ReadStaffReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ReadStaffReplyMultiError is an error wrapping multiple validation errors
+// returned by ReadStaffReply.ValidateAll() if the designated constraints
+// aren't met.
+type ReadStaffReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReadStaffReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReadStaffReplyMultiError) AllErrors() []error { return m }
+
+// ReadStaffReplyValidationError is the validation error returned by
+// ReadStaffReply.Validate if the designated constraints aren't met.
+type ReadStaffReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReadStaffReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReadStaffReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReadStaffReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReadStaffReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReadStaffReplyValidationError) ErrorName() string { return "ReadStaffReplyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ReadStaffReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReadStaffReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReadStaffReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReadStaffReplyValidationError{}
+
 // Validate checks the field values on RecoveryStaffRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -2066,6 +2306,246 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTeamReplyValidationError{}
+
+// Validate checks the field values on ReadTeamRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ReadTeamRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReadTeamRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ReadTeamRequestMultiError, or nil if none found.
+func (m *ReadTeamRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReadTeamRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetId() <= 0 {
+		err := ReadTeamRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ReadTeamRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ReadTeamRequestMultiError is an error wrapping multiple validation errors
+// returned by ReadTeamRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ReadTeamRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReadTeamRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReadTeamRequestMultiError) AllErrors() []error { return m }
+
+// ReadTeamRequestValidationError is the validation error returned by
+// ReadTeamRequest.Validate if the designated constraints aren't met.
+type ReadTeamRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReadTeamRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReadTeamRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReadTeamRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReadTeamRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReadTeamRequestValidationError) ErrorName() string { return "ReadTeamRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ReadTeamRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReadTeamRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReadTeamRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReadTeamRequestValidationError{}
+
+// Validate checks the field values on ReadTeamReply with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ReadTeamReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ReadTeamReply with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ReadTeamReplyMultiError, or
+// nil if none found.
+func (m *ReadTeamReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReadTeamReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTeam()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ReadTeamReplyValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ReadTeamReplyValidationError{
+					field:  "Team",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTeam()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReadTeamReplyValidationError{
+				field:  "Team",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ReadTeamReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ReadTeamReplyMultiError is an error wrapping multiple validation errors
+// returned by ReadTeamReply.ValidateAll() if the designated constraints
+// aren't met.
+type ReadTeamReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReadTeamReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReadTeamReplyMultiError) AllErrors() []error { return m }
+
+// ReadTeamReplyValidationError is the validation error returned by
+// ReadTeamReply.Validate if the designated constraints aren't met.
+type ReadTeamReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReadTeamReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReadTeamReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReadTeamReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReadTeamReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReadTeamReplyValidationError) ErrorName() string { return "ReadTeamReplyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ReadTeamReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReadTeamReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReadTeamReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReadTeamReplyValidationError{}
 
 // Validate checks the field values on ListTeamRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the

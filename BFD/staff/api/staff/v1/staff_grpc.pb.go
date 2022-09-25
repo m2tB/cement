@@ -26,12 +26,14 @@ type StaffClient interface {
 	CreateStaff(ctx context.Context, in *CreateStaffRequest, opts ...grpc.CallOption) (*CreateStaffReply, error)
 	UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*UpdateStaffReply, error)
 	DeleteStaff(ctx context.Context, in *DeleteStaffRequest, opts ...grpc.CallOption) (*DeleteStaffReply, error)
+	ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error)
 	RecoveryStaff(ctx context.Context, in *RecoveryStaffRequest, opts ...grpc.CallOption) (*RecoveryStaffReply, error)
 	ListStaff(ctx context.Context, in *ListStaffRequest, opts ...grpc.CallOption) (*ListStaffReply, error)
 	// team相关接口
 	CreateTeam(ctx context.Context, in *CreateTeamRequest, opts ...grpc.CallOption) (*CreateTeamReply, error)
 	UpdateTeam(ctx context.Context, in *UpdateTeamRequest, opts ...grpc.CallOption) (*UpdateTeamReply, error)
 	DeleteTeam(ctx context.Context, in *DeleteTeamRequest, opts ...grpc.CallOption) (*DeleteTeamReply, error)
+	ReadTeam(ctx context.Context, in *ReadTeamRequest, opts ...grpc.CallOption) (*ReadTeamReply, error)
 	ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamReply, error)
 }
 
@@ -64,6 +66,15 @@ func (c *staffClient) UpdateStaff(ctx context.Context, in *UpdateStaffRequest, o
 func (c *staffClient) DeleteStaff(ctx context.Context, in *DeleteStaffRequest, opts ...grpc.CallOption) (*DeleteStaffReply, error) {
 	out := new(DeleteStaffReply)
 	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/DeleteStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *staffClient) ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error) {
+	out := new(ReadStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ReadStaff", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +126,15 @@ func (c *staffClient) DeleteTeam(ctx context.Context, in *DeleteTeamRequest, opt
 	return out, nil
 }
 
+func (c *staffClient) ReadTeam(ctx context.Context, in *ReadTeamRequest, opts ...grpc.CallOption) (*ReadTeamReply, error) {
+	out := new(ReadTeamReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ReadTeam", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *staffClient) ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamReply, error) {
 	out := new(ListTeamReply)
 	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ListTeam", in, out, opts...)
@@ -132,12 +152,14 @@ type StaffServer interface {
 	CreateStaff(context.Context, *CreateStaffRequest) (*CreateStaffReply, error)
 	UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error)
 	DeleteStaff(context.Context, *DeleteStaffRequest) (*DeleteStaffReply, error)
+	ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error)
 	RecoveryStaff(context.Context, *RecoveryStaffRequest) (*RecoveryStaffReply, error)
 	ListStaff(context.Context, *ListStaffRequest) (*ListStaffReply, error)
 	// team相关接口
 	CreateTeam(context.Context, *CreateTeamRequest) (*CreateTeamReply, error)
 	UpdateTeam(context.Context, *UpdateTeamRequest) (*UpdateTeamReply, error)
 	DeleteTeam(context.Context, *DeleteTeamRequest) (*DeleteTeamReply, error)
+	ReadTeam(context.Context, *ReadTeamRequest) (*ReadTeamReply, error)
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error)
 	mustEmbedUnimplementedStaffServer()
 }
@@ -155,6 +177,9 @@ func (UnimplementedStaffServer) UpdateStaff(context.Context, *UpdateStaffRequest
 func (UnimplementedStaffServer) DeleteStaff(context.Context, *DeleteStaffRequest) (*DeleteStaffReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteStaff not implemented")
 }
+func (UnimplementedStaffServer) ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadStaff not implemented")
+}
 func (UnimplementedStaffServer) RecoveryStaff(context.Context, *RecoveryStaffRequest) (*RecoveryStaffReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecoveryStaff not implemented")
 }
@@ -169,6 +194,9 @@ func (UnimplementedStaffServer) UpdateTeam(context.Context, *UpdateTeamRequest) 
 }
 func (UnimplementedStaffServer) DeleteTeam(context.Context, *DeleteTeamRequest) (*DeleteTeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
+}
+func (UnimplementedStaffServer) ReadTeam(context.Context, *ReadTeamRequest) (*ReadTeamReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadTeam not implemented")
 }
 func (UnimplementedStaffServer) ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeam not implemented")
@@ -236,6 +264,24 @@ func _Staff_DeleteStaff_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(StaffServer).DeleteStaff(ctx, req.(*DeleteStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Staff_ReadStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).ReadStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/ReadStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).ReadStaff(ctx, req.(*ReadStaffRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -330,6 +376,24 @@ func _Staff_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Staff_ReadTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).ReadTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/ReadTeam",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).ReadTeam(ctx, req.(*ReadTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Staff_ListTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTeamRequest)
 	if err := dec(in); err != nil {
@@ -368,6 +432,10 @@ var Staff_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Staff_DeleteStaff_Handler,
 		},
 		{
+			MethodName: "ReadStaff",
+			Handler:    _Staff_ReadStaff_Handler,
+		},
+		{
 			MethodName: "RecoveryStaff",
 			Handler:    _Staff_RecoveryStaff_Handler,
 		},
@@ -386,6 +454,10 @@ var Staff_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTeam",
 			Handler:    _Staff_DeleteTeam_Handler,
+		},
+		{
+			MethodName: "ReadTeam",
+			Handler:    _Staff_ReadTeam_Handler,
 		},
 		{
 			MethodName: "ListTeam",
