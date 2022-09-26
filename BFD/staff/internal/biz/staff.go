@@ -2,13 +2,19 @@ package biz
 
 import (
 	"context"
-	"time"
-
 	"github.com/go-kratos/kratos/v2/log"
+	"time"
 )
 
 // Staff is a Staff model.
 type Staff struct {
+	ID        int64
+	Mobile    string
+	Name      string
+	IsDeleted int
+}
+
+type DataStaff struct {
 	ID        int64
 	Mobile    string
 	Name      string
@@ -22,9 +28,9 @@ type StaffRepo interface {
 	Save(context.Context, *Staff) (bool, error)
 	Update(context.Context, *Staff) (bool, error)
 	Delete(context.Context, *Staff) (bool, error)
-	Read(context.Context, *Staff) (*Staff, error)
+	Read(context.Context, *Staff) (*DataStaff, error)
 
-	List(context.Context, *Staff, int, int) ([]*Staff, int64, error)
+	List(context.Context, *Staff, int, int) ([]*DataStaff, int64, error)
 }
 
 // StaffUsecase is a Staff usecase.
@@ -54,11 +60,11 @@ func (uc *StaffUsecase) DeleteStaff(ctx context.Context, s *Staff) (bool, error)
 }
 
 // ReadStaff read a Staff, and returns the result.
-func (uc *StaffUsecase) ReadStaff(ctx context.Context, s *Staff) (*Staff, error) {
+func (uc *StaffUsecase) ReadStaff(ctx context.Context, s *Staff) (*DataStaff, error) {
 	return uc.repo.Read(ctx, s)
 }
 
 // ListStaff returns the Staff List.
-func (uc *StaffUsecase) ListStaff(ctx context.Context, s *Staff, pn int, pSize int) ([]*Staff, int64, error) {
+func (uc *StaffUsecase) ListStaff(ctx context.Context, s *Staff, pn int, pSize int) ([]*DataStaff, int64, error) {
 	return uc.repo.List(ctx, s, pn, pSize)
 }

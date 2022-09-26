@@ -13,15 +13,17 @@ var ProviderSet = wire.NewSet(NewStaffService)
 type StaffService struct {
 	v1.UnimplementedStaffServer
 
-	staff *biz.StaffUsecase
-	team  *biz.TeamUsecase
-	log   *log.Helper
+	staff     *biz.StaffUsecase
+	team      *biz.TeamUsecase
+	teamStaff *biz.TeamStaffUsecase
+	log       *log.Helper
 }
 
-func NewStaffService(staff *biz.StaffUsecase, team *biz.TeamUsecase, logger log.Logger) *StaffService {
+func NewStaffService(staff *biz.StaffUsecase, team *biz.TeamUsecase, teamStaff *biz.TeamStaffUsecase, logger log.Logger) *StaffService {
 	return &StaffService{
-		staff: staff,
-		team:  team,
-		log:   log.NewHelper(log.With(logger, "module", "service/server-service")),
+		staff:     staff,
+		team:      team,
+		teamStaff: teamStaff,
+		log:       log.NewHelper(log.With(logger, "module", "service/server-service")),
 	}
 }

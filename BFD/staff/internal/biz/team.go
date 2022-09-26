@@ -2,13 +2,20 @@ package biz
 
 import (
 	"context"
-	"time"
-
 	"github.com/go-kratos/kratos/v2/log"
+	"time"
 )
 
 // Team is a Team model.
 type Team struct {
+	ID          int64
+	CName       string
+	EName       string
+	PreTeamCode string
+	IsDeleted   int
+}
+
+type DataTeam struct {
 	ID          int64
 	CName       string
 	EName       string
@@ -23,9 +30,9 @@ type TeamRepo interface {
 	Save(context.Context, *Team) (bool, error)
 	Update(context.Context, *Team) (bool, error)
 	Delete(context.Context, *Team) (bool, error)
-	Read(context.Context, *Team) (*Team, error)
+	Read(context.Context, *Team) (*DataTeam, error)
 
-	List(context.Context, *Team, int, int) ([]*Team, int64, error)
+	List(context.Context, *Team, int, int) ([]*DataTeam, int64, error)
 }
 
 // TeamUsecase is a Team usecase.
@@ -55,11 +62,11 @@ func (uc *TeamUsecase) DeleteTeam(ctx context.Context, t *Team) (bool, error) {
 }
 
 // ReadTeam read a Team, and returns the result.
-func (uc *TeamUsecase) ReadTeam(ctx context.Context, t *Team) (*Team, error) {
+func (uc *TeamUsecase) ReadTeam(ctx context.Context, t *Team) (*DataTeam, error) {
 	return uc.repo.Read(ctx, t)
 }
 
 // ListTeam returns the Team List.
-func (uc *TeamUsecase) ListTeam(ctx context.Context, t *Team, pn int, pSize int) ([]*Team, int64, error) {
+func (uc *TeamUsecase) ListTeam(ctx context.Context, t *Team, pn int, pSize int) ([]*DataTeam, int64, error) {
 	return uc.repo.List(ctx, t, pn, pSize)
 }

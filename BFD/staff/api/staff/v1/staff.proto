@@ -21,6 +21,12 @@ service Staff {
 	rpc DeleteTeam (DeleteTeamRequest) returns (DeleteTeamReply);
 	rpc ReadTeam (ReadTeamRequest) returns (ReadTeamReply);
 	rpc ListTeam (ListTeamRequest) returns (ListTeamReply);
+
+	// team 绑定 staff 相关接口
+	rpc InviteStaff (InviteStaffRequest) returns (InviteStaffReply);
+	rpc ExpelStaff (ExpelStaffRequest) returns (ExpelStaffReply);
+	rpc ListTeamStaff (ListTeamStaffRequest) returns (ListTeamStaffReply);
+	rpc ListStaffTeam (ListStaffTeamRequest) returns (ListStaffTeamReply);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,6 +142,54 @@ message TeamReply {
 	string preTeamCode = 4;
 	string createdAt = 5;
 	string updatedAt = 6;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+message InviteStaffRequest {
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
+	repeated int64 sids = 2;
+}
+message InviteStaffReply {
+	bool exec = 1;
+}
+
+message ExpelStaffRequest {
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 sid = 2 [(validate.rules).int64 = {gt: 0}];
+}
+message ExpelStaffReply {
+	bool exec = 1;
+}
+
+message ListTeamStaffRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	int64 tid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message ListTeamStaffReply {
+	int32 total = 1;
+	repeated TeamStaffReply data = 2;
+}
+message TeamStaffReply {
+	int64 sid = 1;
+	string sName = 2;
+	string createdAt = 3;
+}
+
+message ListStaffTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	int64 sid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message ListStaffTeamReply {
+	int32 total = 1;
+	repeated StaffTeamReply data = 2;
+}
+message StaffTeamReply {
+	int64 tid = 1;
+	string tName = 2;
+	string createdAt = 3;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

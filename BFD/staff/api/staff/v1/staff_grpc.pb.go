@@ -35,6 +35,11 @@ type StaffClient interface {
 	DeleteTeam(ctx context.Context, in *DeleteTeamRequest, opts ...grpc.CallOption) (*DeleteTeamReply, error)
 	ReadTeam(ctx context.Context, in *ReadTeamRequest, opts ...grpc.CallOption) (*ReadTeamReply, error)
 	ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamReply, error)
+	// team 绑定 staff 相关接口
+	InviteStaff(ctx context.Context, in *InviteStaffRequest, opts ...grpc.CallOption) (*InviteStaffReply, error)
+	ExpelStaff(ctx context.Context, in *ExpelStaffRequest, opts ...grpc.CallOption) (*ExpelStaffReply, error)
+	ListTeamStaff(ctx context.Context, in *ListTeamStaffRequest, opts ...grpc.CallOption) (*ListTeamStaffReply, error)
+	ListStaffTeam(ctx context.Context, in *ListStaffTeamRequest, opts ...grpc.CallOption) (*ListStaffTeamReply, error)
 }
 
 type staffClient struct {
@@ -144,6 +149,42 @@ func (c *staffClient) ListTeam(ctx context.Context, in *ListTeamRequest, opts ..
 	return out, nil
 }
 
+func (c *staffClient) InviteStaff(ctx context.Context, in *InviteStaffRequest, opts ...grpc.CallOption) (*InviteStaffReply, error) {
+	out := new(InviteStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/InviteStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *staffClient) ExpelStaff(ctx context.Context, in *ExpelStaffRequest, opts ...grpc.CallOption) (*ExpelStaffReply, error) {
+	out := new(ExpelStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ExpelStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *staffClient) ListTeamStaff(ctx context.Context, in *ListTeamStaffRequest, opts ...grpc.CallOption) (*ListTeamStaffReply, error) {
+	out := new(ListTeamStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ListTeamStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *staffClient) ListStaffTeam(ctx context.Context, in *ListStaffTeamRequest, opts ...grpc.CallOption) (*ListStaffTeamReply, error) {
+	out := new(ListStaffTeamReply)
+	err := c.cc.Invoke(ctx, "/api.staff.v1.Staff/ListStaffTeam", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StaffServer is the server API for Staff service.
 // All implementations must embed UnimplementedStaffServer
 // for forward compatibility
@@ -161,6 +202,11 @@ type StaffServer interface {
 	DeleteTeam(context.Context, *DeleteTeamRequest) (*DeleteTeamReply, error)
 	ReadTeam(context.Context, *ReadTeamRequest) (*ReadTeamReply, error)
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error)
+	// team 绑定 staff 相关接口
+	InviteStaff(context.Context, *InviteStaffRequest) (*InviteStaffReply, error)
+	ExpelStaff(context.Context, *ExpelStaffRequest) (*ExpelStaffReply, error)
+	ListTeamStaff(context.Context, *ListTeamStaffRequest) (*ListTeamStaffReply, error)
+	ListStaffTeam(context.Context, *ListStaffTeamRequest) (*ListStaffTeamReply, error)
 	mustEmbedUnimplementedStaffServer()
 }
 
@@ -200,6 +246,18 @@ func (UnimplementedStaffServer) ReadTeam(context.Context, *ReadTeamRequest) (*Re
 }
 func (UnimplementedStaffServer) ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeam not implemented")
+}
+func (UnimplementedStaffServer) InviteStaff(context.Context, *InviteStaffRequest) (*InviteStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InviteStaff not implemented")
+}
+func (UnimplementedStaffServer) ExpelStaff(context.Context, *ExpelStaffRequest) (*ExpelStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExpelStaff not implemented")
+}
+func (UnimplementedStaffServer) ListTeamStaff(context.Context, *ListTeamStaffRequest) (*ListTeamStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTeamStaff not implemented")
+}
+func (UnimplementedStaffServer) ListStaffTeam(context.Context, *ListStaffTeamRequest) (*ListStaffTeamReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListStaffTeam not implemented")
 }
 func (UnimplementedStaffServer) mustEmbedUnimplementedStaffServer() {}
 
@@ -412,6 +470,78 @@ func _Staff_ListTeam_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Staff_InviteStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InviteStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).InviteStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/InviteStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).InviteStaff(ctx, req.(*InviteStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Staff_ExpelStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExpelStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).ExpelStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/ExpelStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).ExpelStaff(ctx, req.(*ExpelStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Staff_ListTeamStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTeamStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).ListTeamStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/ListTeamStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).ListTeamStaff(ctx, req.(*ListTeamStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Staff_ListStaffTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStaffTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffServer).ListStaffTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff.v1.Staff/ListStaffTeam",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffServer).ListStaffTeam(ctx, req.(*ListStaffTeamRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Staff_ServiceDesc is the grpc.ServiceDesc for Staff service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -462,6 +592,22 @@ var Staff_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListTeam",
 			Handler:    _Staff_ListTeam_Handler,
+		},
+		{
+			MethodName: "InviteStaff",
+			Handler:    _Staff_InviteStaff_Handler,
+		},
+		{
+			MethodName: "ExpelStaff",
+			Handler:    _Staff_ExpelStaff_Handler,
+		},
+		{
+			MethodName: "ListTeamStaff",
+			Handler:    _Staff_ListTeamStaff_Handler,
+		},
+		{
+			MethodName: "ListStaffTeam",
+			Handler:    _Staff_ListStaffTeam_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -86,24 +86,25 @@ func (r *staffRepo) Delete(_ context.Context, s *biz.Staff) (bool, error) {
 	return true, nil
 }
 
-func (r *staffRepo) Read(_ context.Context, s *biz.Staff) (*biz.Staff, error) {
+func (r *staffRepo) Read(_ context.Context, s *biz.Staff) (*biz.DataStaff, error) {
 	var staff Staff
 	exec := r.data.db.Model(&Staff{}).Where("id = ? and is_deleted = ?", s.ID, constant.False).First(&staff)
 	if exec.Error != nil {
-		return nil, exec.Error
+		return nil, status.Errorf(codes.NotFound, exec.Error.Error())
 	}
-	return &biz.Staff{
+	return &biz.DataStaff{
 		ID:        staff.ID,
 		Mobile:    staff.Mobile,
 		Name:      staff.Name,
 		CreatedAt: staff.CreatedAt,
 		UpdatedAt: staff.UpdatedAt,
+		IsDeleted: staff.IsDeleted,
 	}, nil
 }
 
-func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]*biz.Staff, int64, error) {
+func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]*biz.DataStaff, int64, error) {
 	var total int64
-	tx := r.data.db.Model(&Staff{}).Where("is_deleted", s.IsDeleted)
+	tx := r.data.db.Model(&Staff{}).Where("is_deleted = ?", s.IsDeleted)
 	if s.Mobile != "" {
 		tx = tx.Where("mobile = ?", s.Mobile)
 	}
@@ -112,21 +113,22 @@ func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]
 	}
 	exec := tx.Count(&total)
 	if exec.Error != nil || total == 0 {
-		return nil, 0, exec.Error
+		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
 	}
 	var staffs []Staff
-	result := make([]*biz.Staff, 0)
 	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&staffs)
 	if exec.Error != nil {
-		return nil, 0, exec.Error
+		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
 	}
+	result := make([]*biz.DataStaff, 0)
 	for _, staff := range staffs {
-		result = append(result, &biz.Staff{
+		result = append(result, &biz.DataStaff{
 			ID:        staff.ID,
 			Mobile:    staff.Mobile,
 			Name:      staff.Name,
 			CreatedAt: staff.CreatedAt,
 			UpdatedAt: staff.UpdatedAt,
+			IsDeleted: staff.IsDeleted,
 		})
 	}
 	return result, total, nil

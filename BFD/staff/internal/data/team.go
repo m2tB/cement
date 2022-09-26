@@ -14,9 +14,9 @@ import (
 // Team 定义数据表结构体
 type Team struct {
 	ID          int64      `gorm:"primaryKey"`
-	CName       string     `gorm:"column:c_name;type:varchar(32) comment '部门中文名称';not null"`
-	EName       string     `gorm:"column:e_name;type:varchar(64) comment '部门英文名称'"`
-	PreTeamCode string     `gorm:"column:pre_team_code;type:varchar(4) comment '用户昵称';not null"`
+	CName       string     `gorm:"column:c_name;type:varchar(32) comment '中文名称';not null"`
+	EName       string     `gorm:"column:e_name;type:varchar(64) comment '英文名称'"`
+	PreTeamCode string     `gorm:"column:pre_team_code;type:varchar(4) comment '前缀代码';not null"`
 	CreatedAt   *time.Time `gorm:"column:created_at"`
 	UpdatedAt   *time.Time `gorm:"column:updated_at"`
 	IsDeleted   int        `gorm:"column:is_deleted"`
@@ -69,7 +69,7 @@ func (r *teamRepo) Update(_ context.Context, t *biz.Team) (bool, error) {
 func (r *teamRepo) Delete(_ context.Context, t *biz.Team) (bool, error) {
 	var total int64
 	// 验证是否已经创建
-	r.data.db.Model(&Team{}).Where("id = ? and is_deleted != ?", t.ID, constant.False).Count(&total)
+	r.data.db.Model(&Team{}).Where("id = ? and is_deleted = ?", t.ID, constant.False).Count(&total)
 	if total == 0 {
 		return false, status.Errorf(codes.NotFound, "access is not exist.")
 	}
@@ -83,25 +83,26 @@ func (r *teamRepo) Delete(_ context.Context, t *biz.Team) (bool, error) {
 	return true, nil
 }
 
-func (r *teamRepo) Read(_ context.Context, t *biz.Team) (*biz.Team, error) {
+func (r *teamRepo) Read(_ context.Context, t *biz.Team) (*biz.DataTeam, error) {
 	var team Team
 	exec := r.data.db.Model(&Team{}).Where("id = ? and is_deleted = ?", t.ID, constant.False).First(&team)
 	if exec.Error != nil {
-		return nil, exec.Error
+		return nil, status.Errorf(codes.NotFound, exec.Error.Error())
 	}
-	return &biz.Team{
+	return &biz.DataTeam{
 		ID:          team.ID,
 		CName:       team.CName,
 		EName:       team.EName,
 		PreTeamCode: team.PreTeamCode,
 		CreatedAt:   team.CreatedAt,
 		UpdatedAt:   team.UpdatedAt,
+		IsDeleted:   team.IsDeleted,
 	}, nil
 }
 
-func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*biz.Team, int64, error) {
+func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*biz.DataTeam, int64, error) {
 	var total int64
-	tx := r.data.db.Model(&Team{}).Where("is_deleted", constant.False)
+	tx := r.data.db.Model(&Team{}).Where("is_deleted = ?", constant.False)
 	if t.CName != "" {
 		tx = tx.Where("c_name = ?", t.CName)
 	}
@@ -113,22 +114,23 @@ func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*b
 	}
 	exec := tx.Count(&total)
 	if exec.Error != nil || total == 0 {
-		return nil, 0, exec.Error
+		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
 	}
 	var teams []Team
-	result := make([]*biz.Team, 0)
 	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&teams)
 	if exec.Error != nil {
-		return nil, 0, exec.Error
+		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
 	}
+	result := make([]*biz.DataTeam, 0)
 	for _, team := range teams {
-		result = append(result, &biz.Team{
+		result = append(result, &biz.DataTeam{
 			ID:          team.ID,
 			CName:       team.CName,
 			EName:       team.EName,
 			PreTeamCode: team.PreTeamCode,
 			CreatedAt:   team.CreatedAt,
 			UpdatedAt:   team.UpdatedAt,
+			IsDeleted:   team.IsDeleted,
 		})
 	}
 	return result, total, nil
