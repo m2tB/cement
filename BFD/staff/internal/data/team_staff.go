@@ -5,6 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"staff/constant"
 	"staff/internal/biz"
 	"time"
 )
@@ -49,7 +50,7 @@ func (r *teamStaffRepo) Save(_ context.Context, t *biz.TeamStaff) (bool, error) 
 			SID: sid,
 		})
 	}
-	res := r.data.db.Create(&teamStaffs)
+	res := r.data.db.CreateInBatches(&teamStaffs, constant.ExecBatchSize)
 	if res.Error != nil {
 		return false, status.Errorf(codes.Internal, res.Error.Error())
 	}
