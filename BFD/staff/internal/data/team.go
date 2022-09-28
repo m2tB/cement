@@ -40,9 +40,9 @@ func (r *teamRepo) Save(_ context.Context, t *biz.Team) (bool, error) {
 	team.CName = t.CName
 	team.EName = t.EName
 	team.PreTeamCode = t.PreTeamCode
-	res := r.data.db.Create(&team)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Create(&team)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }
@@ -59,9 +59,9 @@ func (r *teamRepo) Update(_ context.Context, t *biz.Team) (bool, error) {
 	team.CName = t.CName
 	team.EName = t.EName
 	team.PreTeamCode = t.PreTeamCode
-	res := r.data.db.Updates(&team)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Updates(&team)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }
@@ -76,9 +76,9 @@ func (r *teamRepo) Delete(_ context.Context, t *biz.Team) (bool, error) {
 	values := map[string]interface{}{
 		"is_deleted": constant.True,
 	}
-	res := r.data.db.Model(&Team{}).Where("id = ?", t.ID).Updates(&values)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Model(&Team{}).Where("id = ?", t.ID).Updates(&values)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }

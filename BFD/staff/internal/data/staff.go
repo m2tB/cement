@@ -44,9 +44,9 @@ func (r *staffRepo) Save(_ context.Context, s *biz.Staff) (bool, error) {
 	var staff Staff
 	staff.Mobile = s.Mobile
 	staff.Name = s.Name
-	res := r.data.db.Create(&staff)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Create(&staff)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }
@@ -62,9 +62,9 @@ func (r *staffRepo) Update(_ context.Context, s *biz.Staff) (bool, error) {
 	staff.ID = s.ID
 	staff.Mobile = s.Mobile
 	staff.Name = s.Name
-	res := r.data.db.Updates(&staff)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Updates(&staff)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }
@@ -79,9 +79,9 @@ func (r *staffRepo) Delete(_ context.Context, s *biz.Staff) (bool, error) {
 	values := map[string]interface{}{
 		"is_deleted": s.IsDeleted,
 	}
-	res := r.data.db.Model(&Staff{}).Where("id = ?", s.ID).Updates(&values)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Model(&Staff{}).Where("id = ?", s.ID).Updates(&values)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }

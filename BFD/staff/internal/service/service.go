@@ -16,14 +16,16 @@ type StaffService struct {
 	staff     *biz.StaffUsecase
 	team      *biz.TeamUsecase
 	teamStaff *biz.TeamStaffUsecase
+	teamTeam  *biz.TeamTeamUsecase
 	log       *log.Helper
 }
 
-func NewStaffService(staff *biz.StaffUsecase, team *biz.TeamUsecase, teamStaff *biz.TeamStaffUsecase, logger log.Logger) *StaffService {
+func NewStaffService(staff *biz.StaffUsecase, team *biz.TeamUsecase, teamStaff *biz.TeamStaffUsecase, teamTeam *biz.TeamTeamUsecase, logger log.Logger) *StaffService {
 	return &StaffService{
 		staff:     staff,
 		team:      team,
 		teamStaff: teamStaff,
+		teamTeam:  teamTeam,
 		log:       log.NewHelper(log.With(logger, "module", "service/server-service")),
 	}
 }

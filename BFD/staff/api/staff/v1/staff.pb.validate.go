@@ -4217,9 +4217,9 @@ func (m *CreateSubTeamRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetSid() <= 0 {
+	if m.GetTid() <= 0 {
 		err := CreateSubTeamRequestValidationError{
-			field:  "Sid",
+			field:  "Tid",
 			reason: "value must be greater than 0",
 		}
 		if !all {
@@ -4456,9 +4456,9 @@ func (m *UpdateSubTeamRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetSid() <= 0 {
+	if m.GetTid() <= 0 {
 		err := UpdateSubTeamRequestValidationError{
-			field:  "Sid",
+			field:  "Tid",
 			reason: "value must be greater than 0",
 		}
 		if !all {
@@ -4673,20 +4673,9 @@ func (m *DeleteSubTeamRequest) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetPid() <= 0 {
+	if m.GetTid() <= 0 {
 		err := DeleteSubTeamRequestValidationError{
-			field:  "Pid",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetSid() <= 0 {
-		err := DeleteSubTeamRequestValidationError{
-			field:  "Sid",
+			field:  "Tid",
 			reason: "value must be greater than 0",
 		}
 		if !all {

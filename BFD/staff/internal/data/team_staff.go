@@ -50,9 +50,9 @@ func (r *teamStaffRepo) Save(_ context.Context, t *biz.TeamStaff) (bool, error) 
 			SID: sid,
 		})
 	}
-	res := r.data.db.CreateInBatches(&teamStaffs, constant.ExecBatchSize)
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.CreateInBatches(&teamStaffs, constant.ExecBatchSize)
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }
@@ -64,9 +64,9 @@ func (r *teamStaffRepo) Delete(_ context.Context, t *biz.TeamStaff) (bool, error
 	if total == 0 {
 		return false, status.Errorf(codes.NotFound, "access is not exist.")
 	}
-	res := r.data.db.Where("tid = ? and sid = ?", t.TID, t.SID).Unscoped().Delete(&TeamStaff{})
-	if res.Error != nil {
-		return false, status.Errorf(codes.Internal, res.Error.Error())
+	exec := r.data.db.Where("tid = ? and sid = ?", t.TID, t.SID).Unscoped().Delete(&TeamStaff{})
+	if exec.Error != nil {
+		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	return true, nil
 }

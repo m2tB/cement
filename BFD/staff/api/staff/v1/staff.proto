@@ -202,7 +202,7 @@ message StaffTeamReply {
 
 message CreateSubTeamRequest {
 	int64 pid = 1 [(validate.rules).int64 = {gt: 0}];
-	int64 sid = 2 [(validate.rules).int64 = {gt: 0}];
+	int64 tid = 2 [(validate.rules).int64 = {gt: 0}];
 }
 message CreateSubTeamReply {
 	bool exec = 1;
@@ -211,15 +211,14 @@ message CreateSubTeamReply {
 message UpdateSubTeamRequest {
 	int64 pid = 1 [(validate.rules).int64 = {gt: 0}];
 	int64 oPid = 2 [(validate.rules).int64 = {gt: 0}];
-	int64 sid = 3 [(validate.rules).int64 = {gt: 0}];
+	int64 tid = 3 [(validate.rules).int64 = {gt: 0}];
 }
 message UpdateSubTeamReply {
 	bool exec = 1;
 }
 
 message DeleteSubTeamRequest {
-	int64 pid = 1 [(validate.rules).int64 = {gt: 0}];
-	int64 sid = 2 [(validate.rules).int64 = {gt: 0}];
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
 }
 message DeleteSubTeamReply {
 	bool exec = 1;
