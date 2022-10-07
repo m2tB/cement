@@ -22,7 +22,7 @@ func (s *StaffService) CreateSubTeam(ctx context.Context, req *v1.CreateSubTeamR
 }
 
 func (s *StaffService) UpdateSubTeam(ctx context.Context, req *v1.UpdateSubTeamRequest) (*v1.UpdateSubTeamReply, error) {
-	_, err := s.teamTeam.CreateSubTeam(ctx, &biz.TeamTeam{
+	_, err := s.teamTeam.UpdateSubTeam(ctx, &biz.TeamTeam{
 		TID:  req.Tid,
 		PID:  req.Pid,
 		OpID: req.OPid,
@@ -50,12 +50,6 @@ func (s *StaffService) DeleteSubTeam(ctx context.Context, req *v1.DeleteSubTeamR
 }
 
 func (s *StaffService) ListTeamSubTeam(ctx context.Context, req *v1.ListTeamSubTeamRequest) (*v1.ListTeamSubTeamReply, error) {
-	_, err := s.team.ReadTeam(ctx, &biz.Team{
-		ID: req.Pid,
-	})
-	if err != nil {
-		return nil, err
-	}
 	list, total, err := s.teamTeam.ListTeamSubTeam(ctx, &biz.TeamTeam{
 		PID: req.Pid,
 	}, int(req.Pn), int(req.PSize))

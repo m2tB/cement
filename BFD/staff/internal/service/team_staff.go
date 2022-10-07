@@ -22,6 +22,7 @@ func (s *StaffService) InviteStaff(ctx context.Context, req *v1.InviteStaffReque
 }
 
 func (s *StaffService) ExpelStaff(ctx context.Context, req *v1.ExpelStaffRequest) (*v1.ExpelStaffReply, error) {
+	// 数据关系删除
 	_, err := s.teamStaff.ExpelStaff(ctx, &biz.TeamStaff{
 		TID: req.Tid,
 		SID: req.Sid,
@@ -36,12 +37,6 @@ func (s *StaffService) ExpelStaff(ctx context.Context, req *v1.ExpelStaffRequest
 }
 
 func (s *StaffService) ListTeamStaff(ctx context.Context, req *v1.ListTeamStaffRequest) (*v1.ListTeamStaffReply, error) {
-	_, err := s.team.ReadTeam(ctx, &biz.Team{
-		ID: req.Tid,
-	})
-	if err != nil {
-		return nil, err
-	}
 	list, total, err := s.teamStaff.ListTeamStaff(ctx, &biz.TeamStaff{
 		TID: req.Tid,
 	}, int(req.Pn), int(req.PSize))
@@ -63,12 +58,6 @@ func (s *StaffService) ListTeamStaff(ctx context.Context, req *v1.ListTeamStaffR
 }
 
 func (s *StaffService) ListStaffTeam(ctx context.Context, req *v1.ListStaffTeamRequest) (*v1.ListStaffTeamReply, error) {
-	_, err := s.staff.ReadStaff(ctx, &biz.Staff{
-		ID: req.Sid,
-	})
-	if err != nil {
-		return nil, err
-	}
 	list, total, err := s.teamStaff.ListStaffTeam(ctx, &biz.TeamStaff{
 		SID: req.Sid,
 	}, int(req.Pn), int(req.PSize))

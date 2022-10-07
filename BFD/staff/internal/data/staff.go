@@ -112,8 +112,11 @@ func (r *staffRepo) List(_ context.Context, s *biz.Staff, pn int, pSize int) ([]
 		tx = tx.Where("name LIKE %?%", s.Name)
 	}
 	exec := tx.Count(&total)
-	if exec.Error != nil || total == 0 {
-		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
+	if exec.Error != nil {
+		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
+	}
+	if total == 0 {
+		return nil, 0, nil
 	}
 	var staffs []Staff
 	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&staffs)

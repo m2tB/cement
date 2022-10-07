@@ -113,8 +113,11 @@ func (r *teamRepo) List(_ context.Context, t *biz.Team, pn int, pSize int) ([]*b
 		tx = tx.Where("pre_team_code = ?", t.PreTeamCode)
 	}
 	exec := tx.Count(&total)
-	if exec.Error != nil || total == 0 {
-		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
+	if exec.Error != nil {
+		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
+	}
+	if total == 0 {
+		return nil, 0, nil
 	}
 	var teams []Team
 	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&teams)

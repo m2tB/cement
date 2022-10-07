@@ -40,9 +40,6 @@ func NewTeamStaffRepo(data *Data, logger log.Logger) biz.TeamStaffRepo {
 }
 
 func (r *teamStaffRepo) Save(_ context.Context, t *biz.TeamStaff) (bool, error) {
-	if len(t.SIDs) <= 0 {
-		return false, status.Errorf(codes.InvalidArgument, "sids is empty.")
-	}
 	var teamStaffs []TeamStaff
 	for _, sid := range t.SIDs {
 		teamStaffs = append(teamStaffs, TeamStaff{
@@ -50,6 +47,10 @@ func (r *teamStaffRepo) Save(_ context.Context, t *biz.TeamStaff) (bool, error) 
 			SID: sid,
 		})
 	}
+	if len(teamStaffs) <= 0 {
+		return false, status.Errorf(codes.InvalidArgument, "sids is empty.")
+	}
+	// - 此处进行联合索引控制
 	exec := r.data.db.CreateInBatches(&teamStaffs, constant.ExecBatchSize)
 	if exec.Error != nil {
 		return false, status.Errorf(codes.Internal, exec.Error.Error())
@@ -86,8 +87,11 @@ func (r *teamStaffRepo) List(_ context.Context, t *biz.TeamStaff, pn int, pSize 
 		tx.Where("team_staff.sid = ?", t.SID)
 	}
 	exec := tx.Scan(&listTeamStaff).Count(&total)
-	if exec.Error != nil || total == 0 {
-		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
+	if exec.Error != nil {
+		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
+	}
+	if total == 0 {
+		return nil, 0, nil
 	}
 	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&listTeamStaff)
 	if exec.Error != nil {

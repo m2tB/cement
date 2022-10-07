@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package api.staff_client.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+option go_package = "staff_client/api/staff_client/v1;v1";
+
+service Staff {
+	rpc Captcha (CaptchaRequest) returns (CaptchaReply) {
+		option (google.api.http) = {
+			get: "/api/staff/captcha",
+		};
+	}
+	rpc Register (RegisterRequest) returns (RegisterReply) {
+		option (google.api.http) = {
+			post: "/api/staff/register",
+			body: "*",
+		};
+	}
+	rpc SignIn (SignInRequest) returns (SignInReply) {
+		option (google.api.http) = {
+			post: "/api/staff/signIn",
+			body: "*",
+		};
+	}
+	rpc SignOut (google.protobuf.Empty) returns (SignOutReply) {
+		option (google.api.http) = {
+			post: "/api/staff/signOut",
+			body: "*",
+		};
+	}
+}
+
+message CaptchaRequest{
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
+}
+message CaptchaReply{
+	bool exec = 1; // 执行结果
+}
+
+message RegisterRequest {
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
+	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}]; // 员工姓名
+}
+message RegisterReply {
+	bool exec = 1; // 执行结果
+}
+
+message SignInRequest{
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
+	string captcha = 2 [(validate.rules).string.len = 6]; // 验证码
+}
+message SignInReply{
+	int64 id = 1;
+	string mobile = 2;
+	string name = 3;
+	string createdAt = 4;
+	string token = 5;
+}
+
+message SignOutReply{
+	bool exec = 1; // 执行结果
+}

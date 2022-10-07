@@ -20,7 +20,7 @@ func Init() {
 
 func main() {
 	Init()
-	teamStaff()
+	teamTeam()
 	conn.Close()
 }
 
@@ -40,8 +40,15 @@ func team() {
 }
 
 func teamStaff() {
-	TestInviteStaff()
-	TestListTeamStaff()
-	TestListStaffTeam()
-	TestExpelStaff()
+	TestInviteStaff()   // team 加入 staff
+	TestListTeamStaff() // 获取team下staff列表
+	TestListStaffTeam() // 获取staff所属team
+	TestExpelStaff()    // team 删除 staff
+}
+
+func teamTeam() {
+	TestCreateSubTeam() // team 加入 team
+	TestUpdateSubTeam() // 更新team下team列表
+	TestListSubTeam()   // 获取team子级team列表
+	TestDeleteSubTeam() // team 删除 子级team
 }

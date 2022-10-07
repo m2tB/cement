@@ -1,0 +1,124 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Staff API
+    version: 0.0.1
+paths:
+    /api/staff/captcha:
+        get:
+            tags:
+                - Staff
+            operationId: Staff_Captcha
+            parameters:
+                - name: mobile
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.CaptchaReply'
+    /api/staff/register:
+        post:
+            tags:
+                - Staff
+            operationId: Staff_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.staff_client.v1.RegisterRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.RegisterReply'
+    /api/staff/signIn:
+        post:
+            tags:
+                - Staff
+            operationId: Staff_SignIn
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.staff_client.v1.SignInRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.SignInReply'
+    /api/staff/signOut:
+        post:
+            tags:
+                - Staff
+            operationId: Staff_SignOut
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.SignOutReply'
+components:
+    schemas:
+        api.staff_client.v1.CaptchaReply:
+            type: object
+            properties:
+                exec:
+                    type: boolean
+        api.staff_client.v1.RegisterReply:
+            type: object
+            properties:
+                exec:
+                    type: boolean
+        api.staff_client.v1.RegisterRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                name:
+                    type: string
+        api.staff_client.v1.SignInReply:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                mobile:
+                    type: string
+                name:
+                    type: string
+                createdAt:
+                    type: string
+                token:
+                    type: string
+        api.staff_client.v1.SignInRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+                captcha:
+                    type: string
+        api.staff_client.v1.SignOutReply:
+            type: object
+            properties:
+                exec:
+                    type: boolean
+tags:
+    - name: Staff

@@ -51,6 +51,7 @@ func (r *teamTeamRepo) Save(_ context.Context, t *biz.TeamTeam) (bool, error) {
 	}
 	var pNode TeamTeam
 	var path string
+	// 验证父节点是否存在
 	exec := r.data.db.Model(&TeamTeam{}).Where("tid = ?", t.PID).First(&pNode)
 	if exec.Error != nil {
 		if exec.Error == gorm.ErrRecordNotFound {
@@ -73,19 +74,20 @@ func (r *teamTeamRepo) Save(_ context.Context, t *biz.TeamTeam) (bool, error) {
 
 func (r *teamTeamRepo) Update(_ context.Context, t *biz.TeamTeam) (bool, error) {
 	var fromTeam TeamTeam
-	// 验证是否已经创建
+	// 验证原父节点是否已经创建
 	exec := r.data.db.Model(&TeamTeam{}).Where("tid = ?", t.OpID).First(&fromTeam)
 	if exec.Error != nil {
 		if exec.Error == gorm.ErrRecordNotFound {
-			return false, status.Errorf(codes.AlreadyExists, "access is not exist.")
+			return false, status.Errorf(codes.NotFound, "access is not exist.")
 		}
 		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	var toTeam TeamTeam
+	// 验证新父节点是否已经创建
 	exec = r.data.db.Model(&TeamTeam{}).Where("tid = ?", t.PID).First(&toTeam)
 	if exec.Error != nil {
 		if exec.Error == gorm.ErrRecordNotFound {
-			return false, status.Errorf(codes.AlreadyExists, "access is not exist.")
+			return false, status.Errorf(codes.NotFound, "access is not exist.")
 		}
 		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
@@ -119,9 +121,10 @@ func (r *teamTeamRepo) Delete(_ context.Context, t *biz.TeamTeam) (bool, error) 
 		return false, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	var total int64
+	// 验证是否存在下级节点 - 存在不允许进行删除,需要先进行迁移
 	r.data.db.Model(&TeamTeam{}).Where("pid = ?", t.TID).Count(&total)
 	if total > 0 {
-		return false, status.Errorf(codes.NotFound, "sub nodes are exist.")
+		return false, status.Errorf(codes.AlreadyExists, "sub nodes are exist.")
 	}
 	exec = r.data.db.Where("tid = ?", t.TID).Unscoped().Delete(&TeamTeam{})
 	if exec.Error != nil {
@@ -132,21 +135,20 @@ func (r *teamTeamRepo) Delete(_ context.Context, t *biz.TeamTeam) (bool, error) 
 
 func (r *teamTeamRepo) List(_ context.Context, t *biz.TeamTeam, pn int, pSize int) ([]*biz.DataListTeamTeam, int64, error) {
 	var total int64
-	tx := r.data.db.Table("team_team")
 	var listTeamTeam []ListTeamTeam
-	if t.PID != 0 {
-		tx.Select("t.id as tid, t.c_name as t_name, team_team.created_at as created_at")
-		tx.Joins("left join team t on team_team.tid = t.id")
-		tx.Where("team_team.pid = ?", t.PID)
-	}
+	// 只获取下一级节点, -- 待考虑
+	tx := r.data.db.Table("team_team")
+	tx.Select("t.id as tid, t.c_name as t_name, team_team.created_at as created_at")
+	tx.Joins("left join team t on team_team.tid = t.id")
+	tx.Where("team_team.pid = ?", t.PID)
 	exec := tx.Scan(&listTeamTeam).Count(&total)
 	if exec.Error != nil {
 		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
 	}
 	if total == 0 {
-		return nil, 0, status.Errorf(codes.NotFound, exec.Error.Error())
+		return nil, 0, nil
 	}
-	exec = tx.Order("created_at desc").Scopes(paginate(pn, pSize)).Find(&listTeamTeam)
+	exec = tx.Order("created_at asc").Scopes(paginate(pn, pSize)).Find(&listTeamTeam)
 	if exec.Error != nil {
 		return nil, 0, status.Errorf(codes.Internal, exec.Error.Error())
 	}
