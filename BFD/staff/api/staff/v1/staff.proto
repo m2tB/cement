@@ -40,7 +40,7 @@ service Staff {
 // 创建Staff请求接口参数
 message CreateStaffRequest {
 	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
-	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}]; // 员工姓名
+	string name = 2 [(validate.rules).string = {min_len: 2, max_len: 6}]; // 员工姓名
 }
 message CreateStaffReply {
 	bool exec = 1; // 执行结果
@@ -49,7 +49,7 @@ message CreateStaffReply {
 message UpdateStaffRequest {
 	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
 	string mobile = 2 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
-	string name = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+	string name = 3 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
 }
 message UpdateStaffReply {
 	bool exec = 1;
@@ -80,7 +80,7 @@ message ListStaffRequest {
 	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
 	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
 	string mobile = 3 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
-	string name = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+	string name = 4 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
 	bool isDeleted = 5;
 }
 message ListStaffReply {
@@ -100,7 +100,7 @@ message StaffReply {
 message CreateTeamRequest {
 	string cName = 1 [(validate.rules).string = {min_len: 1, max_len: 32}]; // team中文名称
 	string eName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}]; // team英文名称
-	string preTeamCode = 3 [(validate.rules).string = {min_len: 1, max_len: 4}]; // team前置代码 - 用于成员工号生成或标识
+	string preTeamCode = 3 [(validate.rules).string = {min_len: 2, max_len: 6}]; // team前置代码 - 用于成员工号生成或标识
 }
 message CreateTeamReply {
 	bool exec = 1;
@@ -110,7 +110,7 @@ message UpdateTeamRequest {
 	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
 	string cName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
 	string eName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
-	string preTeamCode = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+	string preTeamCode = 4 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
 }
 message UpdateTeamReply {
 	bool exec = 1;
@@ -135,7 +135,7 @@ message ListTeamRequest {
 	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
 	string cName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
 	string eName = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
-	string preTeamCode = 5 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 4}];
+	string preTeamCode = 5 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
 }
 message ListTeamReply {
 	int32 total = 1;

@@ -4,6 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	v1 "staff_client/api/staff_client/v1"
+	"staff_client/internal/biz"
 )
 
 // ProviderSet is service providers.

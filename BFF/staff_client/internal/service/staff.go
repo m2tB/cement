@@ -8,14 +8,14 @@ import (
 )
 
 func (s *StaffService) Captcha(ctx context.Context, req *v1.CaptchaRequest) (*v1.CaptchaReply, error) {
-	return &v1.CaptchaReply{}, nil
+	return s.uc.Captcha(ctx, req)
 }
 func (s *StaffService) Register(ctx context.Context, req *v1.RegisterRequest) (*v1.RegisterReply, error) {
-	return &v1.RegisterReply{}, nil
+	return s.uc.Register(ctx, req)
 }
 func (s *StaffService) SignIn(ctx context.Context, req *v1.SignInRequest) (*v1.SignInReply, error) {
-	return &v1.SignInReply{}, nil
+	return s.uc.SignIn(ctx, req)
 }
-func (s *StaffService) SignOut(ctx context.Context, r *emptypb.Empty) (*v1.SignOutReply, error) {
-	return &v1.SignOutReply{}, nil
+func (s *StaffService) SignOut(ctx context.Context, _ *emptypb.Empty) (*v1.SignOutReply, error) {
+	return s.uc.SignOut(ctx)
 }

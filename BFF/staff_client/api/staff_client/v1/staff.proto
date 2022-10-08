@@ -43,7 +43,7 @@ message CaptchaReply{
 
 message RegisterRequest {
 	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
-	string name = 2 [(validate.rules).string = {min_len: 1, max_len: 4}]; // 员工姓名
+	string name = 2 [(validate.rules).string = {min_len: 2, max_len: 6}]; // 员工姓名
 }
 message RegisterReply {
 	bool exec = 1; // 执行结果

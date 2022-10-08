@@ -16,20 +16,23 @@ import (
 	"staff_client/internal/service"
 )
 
-// NewHTTPServer new a HTTP server.
+// NewHTTPServer new an HTTP server.
 func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
-			validate.Validator(), // 接口访问的参数校验
-			selector.Server( // jwt 验证
+			// 接口访问的参数校验
+			validate.Validator(),
+			// jwt 验证
+			selector.Server(
 				jwt.Server(func(token *jwt2.Token) (interface{}, error) {
 					return []byte(auth.JwtKey), nil
 				}, jwt.WithSigningMethod(jwt2.SigningMethodHS256)),
 			).Match(NewWhiteListMatcher()).Build(),
 			logging.Server(logger),
 		),
-		http.Filter(handlers.CORS( // 浏览器跨域
+		// 浏览器跨域设置
+		http.Filter(handlers.CORS(
 			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
 			handlers.AllowedOrigins([]string{"*"}),
