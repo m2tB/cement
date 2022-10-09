@@ -19,194 +19,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// StaffClient is the client API for Staff service.
+// StaffClientClient is the client API for StaffClient service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type StaffClient interface {
+type StaffClientClient interface {
 	Captcha(ctx context.Context, in *CaptchaRequest, opts ...grpc.CallOption) (*CaptchaReply, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInReply, error)
 	SignOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SignOutReply, error)
 }
 
-type staffClient struct {
+type staffClientClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewStaffClient(cc grpc.ClientConnInterface) StaffClient {
-	return &staffClient{cc}
+func NewStaffClientClient(cc grpc.ClientConnInterface) StaffClientClient {
+	return &staffClientClient{cc}
 }
 
-func (c *staffClient) Captcha(ctx context.Context, in *CaptchaRequest, opts ...grpc.CallOption) (*CaptchaReply, error) {
+func (c *staffClientClient) Captcha(ctx context.Context, in *CaptchaRequest, opts ...grpc.CallOption) (*CaptchaReply, error) {
 	out := new(CaptchaReply)
-	err := c.cc.Invoke(ctx, "/api.staff_client.v1.Staff/Captcha", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/Captcha", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *staffClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
+func (c *staffClientClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error) {
 	out := new(RegisterReply)
-	err := c.cc.Invoke(ctx, "/api.staff_client.v1.Staff/Register", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *staffClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInReply, error) {
+func (c *staffClientClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInReply, error) {
 	out := new(SignInReply)
-	err := c.cc.Invoke(ctx, "/api.staff_client.v1.Staff/SignIn", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/SignIn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *staffClient) SignOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SignOutReply, error) {
+func (c *staffClientClient) SignOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SignOutReply, error) {
 	out := new(SignOutReply)
-	err := c.cc.Invoke(ctx, "/api.staff_client.v1.Staff/SignOut", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/SignOut", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// StaffServer is the server API for Staff service.
-// All implementations must embed UnimplementedStaffServer
+// StaffClientServer is the server API for StaffClient service.
+// All implementations must embed UnimplementedStaffClientServer
 // for forward compatibility
-type StaffServer interface {
+type StaffClientServer interface {
 	Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	SignIn(context.Context, *SignInRequest) (*SignInReply, error)
 	SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error)
-	mustEmbedUnimplementedStaffServer()
+	mustEmbedUnimplementedStaffClientServer()
 }
 
-// UnimplementedStaffServer must be embedded to have forward compatible implementations.
-type UnimplementedStaffServer struct {
+// UnimplementedStaffClientServer must be embedded to have forward compatible implementations.
+type UnimplementedStaffClientServer struct {
 }
 
-func (UnimplementedStaffServer) Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error) {
+func (UnimplementedStaffClientServer) Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Captcha not implemented")
 }
-func (UnimplementedStaffServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
+func (UnimplementedStaffClientServer) Register(context.Context, *RegisterRequest) (*RegisterReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedStaffServer) SignIn(context.Context, *SignInRequest) (*SignInReply, error) {
+func (UnimplementedStaffClientServer) SignIn(context.Context, *SignInRequest) (*SignInReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedStaffServer) SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error) {
+func (UnimplementedStaffClientServer) SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignOut not implemented")
 }
-func (UnimplementedStaffServer) mustEmbedUnimplementedStaffServer() {}
+func (UnimplementedStaffClientServer) mustEmbedUnimplementedStaffClientServer() {}
 
-// UnsafeStaffServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to StaffServer will
+// UnsafeStaffClientServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StaffClientServer will
 // result in compilation errors.
-type UnsafeStaffServer interface {
-	mustEmbedUnimplementedStaffServer()
+type UnsafeStaffClientServer interface {
+	mustEmbedUnimplementedStaffClientServer()
 }
 
-func RegisterStaffServer(s grpc.ServiceRegistrar, srv StaffServer) {
-	s.RegisterService(&Staff_ServiceDesc, srv)
+func RegisterStaffClientServer(s grpc.ServiceRegistrar, srv StaffClientServer) {
+	s.RegisterService(&StaffClient_ServiceDesc, srv)
 }
 
-func _Staff_Captcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StaffClient_Captcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CaptchaRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StaffServer).Captcha(ctx, in)
+		return srv.(StaffClientServer).Captcha(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.staff_client.v1.Staff/Captcha",
+		FullMethod: "/api.staff_client.v1.StaffClient/Captcha",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffServer).Captcha(ctx, req.(*CaptchaRequest))
+		return srv.(StaffClientServer).Captcha(ctx, req.(*CaptchaRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Staff_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StaffClient_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StaffServer).Register(ctx, in)
+		return srv.(StaffClientServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.staff_client.v1.Staff/Register",
+		FullMethod: "/api.staff_client.v1.StaffClient/Register",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffServer).Register(ctx, req.(*RegisterRequest))
+		return srv.(StaffClientServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Staff_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StaffClient_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SignInRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StaffServer).SignIn(ctx, in)
+		return srv.(StaffClientServer).SignIn(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.staff_client.v1.Staff/SignIn",
+		FullMethod: "/api.staff_client.v1.StaffClient/SignIn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffServer).SignIn(ctx, req.(*SignInRequest))
+		return srv.(StaffClientServer).SignIn(ctx, req.(*SignInRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Staff_SignOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StaffClient_SignOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StaffServer).SignOut(ctx, in)
+		return srv.(StaffClientServer).SignOut(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.staff_client.v1.Staff/SignOut",
+		FullMethod: "/api.staff_client.v1.StaffClient/SignOut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffServer).SignOut(ctx, req.(*emptypb.Empty))
+		return srv.(StaffClientServer).SignOut(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Staff_ServiceDesc is the grpc.ServiceDesc for Staff service.
+// StaffClient_ServiceDesc is the grpc.ServiceDesc for StaffClient service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Staff_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.staff_client.v1.Staff",
-	HandlerType: (*StaffServer)(nil),
+var StaffClient_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.staff_client.v1.StaffClient",
+	HandlerType: (*StaffClientServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Captcha",
-			Handler:    _Staff_Captcha_Handler,
+			Handler:    _StaffClient_Captcha_Handler,
 		},
 		{
 			MethodName: "Register",
-			Handler:    _Staff_Register_Handler,
+			Handler:    _StaffClient_Register_Handler,
 		},
 		{
 			MethodName: "SignIn",
-			Handler:    _Staff_SignIn_Handler,
+			Handler:    _StaffClient_SignIn_Handler,
 		},
 		{
 			MethodName: "SignOut",
-			Handler:    _Staff_SignOut_Handler,
+			Handler:    _StaffClient_SignOut_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

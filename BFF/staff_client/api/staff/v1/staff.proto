@@ -1,0 +1,240 @@
+syntax = "proto3";
+
+package api.staff.v1;
+
+import "validate/validate.proto";
+
+option go_package = "staff/api/staff/v1;v1";
+
+service Staff {
+	// staff相关接口
+	rpc CreateStaff (CreateStaffRequest) returns (CreateStaffReply); // 新增
+	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply); // 更新
+	rpc DeleteStaff (DeleteStaffRequest) returns (DeleteStaffReply); // 删除 - 软删除
+	rpc ReadStaff (ReadStaffRequest) returns (ReadStaffReply); // 查询
+	rpc RecoveryStaff (RecoveryStaffRequest) returns (RecoveryStaffReply); // 恢复 - 删除恢复
+	rpc ListStaff (ListStaffRequest) returns (ListStaffReply); // 列表查询
+
+	// team相关接口
+	rpc CreateTeam (CreateTeamRequest) returns (CreateTeamReply); // 新增
+	rpc UpdateTeam (UpdateTeamRequest) returns (UpdateTeamReply); // 更新
+	rpc DeleteTeam (DeleteTeamRequest) returns (DeleteTeamReply); // 删除 - 软删除
+	rpc ReadTeam (ReadTeamRequest) returns (ReadTeamReply); // 查询
+	rpc ListTeam (ListTeamRequest) returns (ListTeamReply); // 列表查询
+
+	// team 绑定 staff 相关接口
+	rpc InviteStaff (InviteStaffRequest) returns (InviteStaffReply); // 邀请 - 新增staff - team绑定关系
+	rpc ExpelStaff (ExpelStaffRequest) returns (ExpelStaffReply); // 踢出 - 删除staff - team绑定关系
+	rpc ListTeamStaff (ListTeamStaffRequest) returns (ListTeamStaffReply); // 列表查询 - 获取team下staff列表信息
+	rpc ListStaffTeam (ListStaffTeamRequest) returns (ListStaffTeamReply); // 列表查询 - 获取staff所属team列表信息
+
+	// team 绑定 team 相关接口
+	rpc CreateSubTeam (CreateSubTeamRequest) returns (CreateSubTeamReply); // 新增 - 新增team - team绑定关系
+	rpc UpdateSubTeam (UpdateSubTeamRequest) returns (UpdateSubTeamReply); // 更新 - 更新team - team绑定关系
+	rpc DeleteSubTeam (DeleteSubTeamRequest) returns (DeleteSubTeamReply); // 删除 - 删除team - team绑定关系
+	rpc ListTeamSubTeam (ListTeamSubTeamRequest) returns (ListTeamSubTeamReply); // 列表查询 - 获取team下team列表信息
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// 创建Staff请求接口参数
+message CreateStaffRequest {
+	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
+	string name = 2 [(validate.rules).string = {min_len: 2, max_len: 6}]; // 员工姓名
+}
+message CreateStaffReply {
+	bool exec = 1; // 执行结果
+}
+
+message UpdateStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+	string mobile = 2 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
+	string name = 3 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+}
+message UpdateStaffReply {
+	bool exec = 1;
+}
+
+message DeleteStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message DeleteStaffReply {
+	bool exec = 1;
+}
+
+message ReadStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message ReadStaffReply {
+	StaffReply staff = 1;
+}
+
+message RecoveryStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message RecoveryStaffReply {
+	bool exec = 1;
+}
+
+message ListStaffRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	string mobile = 3 [(validate.rules).string = {ignore_empty: true, pattern: "^0?(13|14|15|17|18|19)[0-9]{9}$"}];
+	string name = 4 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+	bool isDeleted = 5;
+}
+message ListStaffReply {
+	int32 total = 1;
+	repeated StaffReply data = 2;
+}
+message StaffReply {
+	int64 id = 1;
+	string mobile = 2;
+	string name = 3;
+	string createdAt = 4;
+	string updatedAt = 5;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+message CreateTeamRequest {
+	string cName = 1 [(validate.rules).string = {min_len: 1, max_len: 32}]; // team中文名称
+	string eName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}]; // team英文名称
+	string preTeamCode = 3 [(validate.rules).string = {min_len: 2, max_len: 6}]; // team前置代码 - 用于成员工号生成或标识
+}
+message CreateTeamReply {
+	bool exec = 1;
+}
+
+message UpdateTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+	string cName = 2 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
+	string eName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
+	string preTeamCode = 4 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+}
+message UpdateTeamReply {
+	bool exec = 1;
+}
+
+message DeleteTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message DeleteTeamReply {
+	bool exec = 1;
+}
+
+message ReadTeamRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message ReadTeamReply {
+	TeamReply team = 1;
+}
+
+message ListTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	string cName = 3 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 32}];
+	string eName = 4 [(validate.rules).string = {ignore_empty: true, min_len: 1, max_len: 64}];
+	string preTeamCode = 5 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+}
+message ListTeamReply {
+	int32 total = 1;
+	repeated TeamReply data = 2;
+}
+message TeamReply {
+	int64 id = 1;
+	string cName = 2;
+	string eName = 3;
+	string preTeamCode = 4;
+	string createdAt = 5;
+	string updatedAt = 6;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+message InviteStaffRequest {
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
+	repeated int64 sids = 2;
+}
+message InviteStaffReply {
+	bool exec = 1;
+}
+
+message ExpelStaffRequest {
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 sid = 2 [(validate.rules).int64 = {gt: 0}];
+}
+message ExpelStaffReply {
+	bool exec = 1;
+}
+
+message ListTeamStaffRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	int64 tid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message ListTeamStaffReply {
+	int32 total = 1;
+	repeated TeamStaffReply data = 2;
+}
+message TeamStaffReply {
+	int64 sid = 1;
+	string sName = 2;
+	string createdAt = 3;
+}
+
+message ListStaffTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	int64 sid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message ListStaffTeamReply {
+	int32 total = 1;
+	repeated StaffTeamReply data = 2;
+}
+message StaffTeamReply {
+	int64 tid = 1;
+	string tName = 2;
+	string createdAt = 3;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+message CreateSubTeamRequest {
+	int64 pid = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 tid = 2 [(validate.rules).int64 = {gt: 0}];
+}
+message CreateSubTeamReply {
+	bool exec = 1;
+}
+
+message UpdateSubTeamRequest {
+	int64 pid = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 oPid = 2 [(validate.rules).int64 = {gt: 0}];
+	int64 tid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message UpdateSubTeamReply {
+	bool exec = 1;
+}
+
+message DeleteSubTeamRequest {
+	int64 tid = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message DeleteSubTeamReply {
+	bool exec = 1;
+}
+
+message ListTeamSubTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+	int64 pid = 3 [(validate.rules).int64 = {gt: 0}];
+}
+message ListTeamSubTeamReply {
+	int32 total = 1;
+	repeated TeamSubTeamReply data = 2;
+}
+message TeamSubTeamReply {
+	int64 tid = 1;
+	string tName = 2;
+	string createdAt = 3;
+}

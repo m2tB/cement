@@ -6,6 +6,7 @@ import (
 )
 
 type CusClaims struct {
+	ID     int64
 	Mobile string
 	Name   string
 	jwt.RegisteredClaims

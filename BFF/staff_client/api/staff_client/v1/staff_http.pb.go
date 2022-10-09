@@ -20,33 +20,33 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationStaffCaptcha = "/api.staff_client.v1.Staff/Captcha"
-const OperationStaffRegister = "/api.staff_client.v1.Staff/Register"
-const OperationStaffSignIn = "/api.staff_client.v1.Staff/SignIn"
-const OperationStaffSignOut = "/api.staff_client.v1.Staff/SignOut"
+const OperationStaffClientCaptcha = "/api.staff_client.v1.StaffClient/Captcha"
+const OperationStaffClientRegister = "/api.staff_client.v1.StaffClient/Register"
+const OperationStaffClientSignIn = "/api.staff_client.v1.StaffClient/SignIn"
+const OperationStaffClientSignOut = "/api.staff_client.v1.StaffClient/SignOut"
 
-type StaffHTTPServer interface {
+type StaffClientHTTPServer interface {
 	Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	SignIn(context.Context, *SignInRequest) (*SignInReply, error)
 	SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error)
 }
 
-func RegisterStaffHTTPServer(s *http.Server, srv StaffHTTPServer) {
+func RegisterStaffClientHTTPServer(s *http.Server, srv StaffClientHTTPServer) {
 	r := s.Route("/")
-	r.GET("/api/staff/captcha", _Staff_Captcha0_HTTP_Handler(srv))
-	r.POST("/api/staff/register", _Staff_Register0_HTTP_Handler(srv))
-	r.POST("/api/staff/signIn", _Staff_SignIn0_HTTP_Handler(srv))
-	r.POST("/api/staff/signOut", _Staff_SignOut0_HTTP_Handler(srv))
+	r.GET("/api/staff_client/captcha", _StaffClient_Captcha0_HTTP_Handler(srv))
+	r.POST("/api/staff_client/register", _StaffClient_Register0_HTTP_Handler(srv))
+	r.POST("/api/staff_client/signIn", _StaffClient_SignIn0_HTTP_Handler(srv))
+	r.POST("/api/staff_client/signOut", _StaffClient_SignOut0_HTTP_Handler(srv))
 }
 
-func _Staff_Captcha0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) error {
+func _StaffClient_Captcha0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CaptchaRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationStaffCaptcha)
+		http.SetOperation(ctx, OperationStaffClientCaptcha)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Captcha(ctx, req.(*CaptchaRequest))
 		})
@@ -59,13 +59,13 @@ func _Staff_Captcha0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) er
 	}
 }
 
-func _Staff_Register0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) error {
+func _StaffClient_Register0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in RegisterRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationStaffRegister)
+		http.SetOperation(ctx, OperationStaffClientRegister)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Register(ctx, req.(*RegisterRequest))
 		})
@@ -78,13 +78,13 @@ func _Staff_Register0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) e
 	}
 }
 
-func _Staff_SignIn0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) error {
+func _StaffClient_SignIn0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in SignInRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationStaffSignIn)
+		http.SetOperation(ctx, OperationStaffClientSignIn)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.SignIn(ctx, req.(*SignInRequest))
 		})
@@ -97,13 +97,13 @@ func _Staff_SignIn0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) err
 	}
 }
 
-func _Staff_SignOut0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) error {
+func _StaffClient_SignOut0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationStaffSignOut)
+		http.SetOperation(ctx, OperationStaffClientSignOut)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.SignOut(ctx, req.(*emptypb.Empty))
 		})
@@ -116,26 +116,26 @@ func _Staff_SignOut0_HTTP_Handler(srv StaffHTTPServer) func(ctx http.Context) er
 	}
 }
 
-type StaffHTTPClient interface {
+type StaffClientHTTPClient interface {
 	Captcha(ctx context.Context, req *CaptchaRequest, opts ...http.CallOption) (rsp *CaptchaReply, err error)
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	SignIn(ctx context.Context, req *SignInRequest, opts ...http.CallOption) (rsp *SignInReply, err error)
 	SignOut(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *SignOutReply, err error)
 }
 
-type StaffHTTPClientImpl struct {
+type StaffClientHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewStaffHTTPClient(client *http.Client) StaffHTTPClient {
-	return &StaffHTTPClientImpl{client}
+func NewStaffClientHTTPClient(client *http.Client) StaffClientHTTPClient {
+	return &StaffClientHTTPClientImpl{client}
 }
 
-func (c *StaffHTTPClientImpl) Captcha(ctx context.Context, in *CaptchaRequest, opts ...http.CallOption) (*CaptchaReply, error) {
+func (c *StaffClientHTTPClientImpl) Captcha(ctx context.Context, in *CaptchaRequest, opts ...http.CallOption) (*CaptchaReply, error) {
 	var out CaptchaReply
-	pattern := "/api/staff/captcha"
+	pattern := "/api/staff_client/captcha"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationStaffCaptcha))
+	opts = append(opts, http.Operation(OperationStaffClientCaptcha))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -144,11 +144,11 @@ func (c *StaffHTTPClientImpl) Captcha(ctx context.Context, in *CaptchaRequest, o
 	return &out, err
 }
 
-func (c *StaffHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
+func (c *StaffClientHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
-	pattern := "/api/staff/register"
+	pattern := "/api/staff_client/register"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationStaffRegister))
+	opts = append(opts, http.Operation(OperationStaffClientRegister))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -157,11 +157,11 @@ func (c *StaffHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest,
 	return &out, err
 }
 
-func (c *StaffHTTPClientImpl) SignIn(ctx context.Context, in *SignInRequest, opts ...http.CallOption) (*SignInReply, error) {
+func (c *StaffClientHTTPClientImpl) SignIn(ctx context.Context, in *SignInRequest, opts ...http.CallOption) (*SignInReply, error) {
 	var out SignInReply
-	pattern := "/api/staff/signIn"
+	pattern := "/api/staff_client/signIn"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationStaffSignIn))
+	opts = append(opts, http.Operation(OperationStaffClientSignIn))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -170,11 +170,11 @@ func (c *StaffHTTPClientImpl) SignIn(ctx context.Context, in *SignInRequest, opt
 	return &out, err
 }
 
-func (c *StaffHTTPClientImpl) SignOut(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*SignOutReply, error) {
+func (c *StaffClientHTTPClientImpl) SignOut(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*SignOutReply, error) {
 	var out SignOutReply
-	pattern := "/api/staff/signOut"
+	pattern := "/api/staff_client/signOut"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationStaffSignOut))
+	opts = append(opts, http.Operation(OperationStaffClientSignOut))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

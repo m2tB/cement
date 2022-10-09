@@ -10,17 +10,17 @@ import (
 // ProviderSet is service providers.
 var ProviderSet = wire.NewSet(NewStaffClientService)
 
-// StaffService is a staff service.
-type StaffService struct {
-	v1.UnimplementedStaffServer
+// StaffClientService is a staff service.
+type StaffClientService struct {
+	v1.UnimplementedStaffClientServer
 
-	uc  *biz.StaffUsecase
+	uc  *biz.StaffClientUsecase
 	log *log.Helper
 }
 
 // NewStaffClientService new a staff service.
-func NewStaffClientService(uc *biz.StaffUsecase, logger log.Logger) *StaffService {
-	return &StaffService{
+func NewStaffClientService(uc *biz.StaffClientUsecase, logger log.Logger) *StaffClientService {
+	return &StaffClientService{
 		uc:  uc,
 		log: log.NewHelper(log.With(logger, "module", "service/staff_client")),
 	}

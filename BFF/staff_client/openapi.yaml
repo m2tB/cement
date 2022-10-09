@@ -3,14 +3,14 @@
 
 openapi: 3.0.3
 info:
-    title: Staff API
+    title: StaffClient API
     version: 0.0.1
 paths:
-    /api/staff/captcha:
+    /api/staff_client/captcha:
         get:
             tags:
-                - Staff
-            operationId: Staff_Captcha
+                - StaffClient
+            operationId: StaffClient_Captcha
             parameters:
                 - name: mobile
                   in: query
@@ -23,11 +23,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.CaptchaReply'
-    /api/staff/register:
+    /api/staff_client/register:
         post:
             tags:
-                - Staff
-            operationId: Staff_Register
+                - StaffClient
+            operationId: StaffClient_Register
             requestBody:
                 content:
                     application/json:
@@ -41,11 +41,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.RegisterReply'
-    /api/staff/signIn:
+    /api/staff_client/signIn:
         post:
             tags:
-                - Staff
-            operationId: Staff_SignIn
+                - StaffClient
+            operationId: StaffClient_SignIn
             requestBody:
                 content:
                     application/json:
@@ -59,11 +59,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.SignInReply'
-    /api/staff/signOut:
+    /api/staff_client/signOut:
         post:
             tags:
-                - Staff
-            operationId: Staff_SignOut
+                - StaffClient
+            operationId: StaffClient_SignOut
             requestBody:
                 content:
                     application/json: {}
@@ -121,4 +121,4 @@ components:
                 exec:
                     type: boolean
 tags:
-    - name: Staff
+    - name: StaffClient

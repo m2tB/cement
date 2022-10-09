@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"github.com/go-kratos/kratos/v2/registry"
+	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"os"
 
 	"github.com/go-kratos/kratos/v2"
@@ -12,12 +16,16 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"staff/internal/conf"
+
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	traceSdk "go.opentelemetry.io/otel/sdk/trace"
+	semConv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
 	// Name is the name of the compiled software.
-	Name = "cement.access.service"
+	Name = "cement.access.service.staff"
 	// Version is the version of the compiled software.
 	Version = "v1.0.0"
 	// flagconf is the config flag.
@@ -32,7 +40,7 @@ func init() {
 
 func newApp(logger log.Logger, gs *grpc.Server, rr registry.Registrar) *kratos.App {
 	return kratos.New(
-		kratos.ID(id),
+		kratos.ID(id+".service."+uuid.NewString()),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
@@ -42,6 +50,28 @@ func newApp(logger log.Logger, gs *grpc.Server, rr registry.Registrar) *kratos.A
 		),
 		kratos.Registrar(rr), // consul 的引入
 	)
+}
+
+// Set global trace provider 设置链路追逐的方法
+func setTracerProvider(url string) error {
+	// Create the Jaeger exporter
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	if err != nil {
+		return err
+	}
+	tp := traceSdk.NewTracerProvider(
+		// Set the sampling rate based on the parent span to 100%
+		traceSdk.WithSampler(traceSdk.ParentBased(traceSdk.TraceIDRatioBased(1.0))),
+		// Always be sure to batch in production.
+		traceSdk.WithBatcher(exp),
+		// Record information about this application in an Resource.
+		traceSdk.WithResource(resource.NewSchemaless(
+			semConv.ServiceNameKey.String(Name),
+			attribute.String("env", "dev"),
+		)),
+	)
+	otel.SetTracerProvider(tp)
+	return nil
 }
 
 func main() {
@@ -68,6 +98,10 @@ func main() {
 
 	var bc conf.Bootstrap
 	if err := c.Scan(&bc); err != nil {
+		panic(err)
+	}
+	// 加入链路追踪的配置
+	if err := setTracerProvider(bc.Trace.Endpoint); err != nil {
 		panic(err)
 	}
 	// consul 的引入

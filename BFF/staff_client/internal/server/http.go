@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	jwt2 "github.com/golang-jwt/jwt/v4"
@@ -17,12 +19,14 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffClientService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
 			// 接口访问的参数校验
 			validate.Validator(),
+			// 这里是本篇新增的
+			tracing.Server(),
 			// jwt 验证
 			selector.Server(
 				jwt.Server(func(token *jwt2.Token) (interface{}, error) {
@@ -48,17 +52,18 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffServic
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterStaffHTTPServer(srv, service)
+	v1.RegisterStaffClientHTTPServer(srv, service)
 	return srv
 }
 
 // NewWhiteListMatcher 设置白名单，不需要 token 验证的接口
 func NewWhiteListMatcher() selector.MatchFunc {
 	whiteList := make(map[string]struct{})
-	whiteList["/api.staff_client.v1.Staff/Captcha"] = struct{}{}
-	whiteList["/api.staff_client.v1.Staff/SignIn"] = struct{}{}
-	whiteList["/api.staff_client.v1.Staff/Register"] = struct{}{}
+	whiteList["/api.staff_client.v1.StaffClient/Captcha"] = struct{}{}
+	whiteList["/api.staff_client.v1.StaffClient/SignIn"] = struct{}{}
+	whiteList["/api.staff_client.v1.StaffClient/Register"] = struct{}{}
 	return func(ctx context.Context, operation string) bool {
+		fmt.Printf("operation - %s", operation)
 		if _, ok := whiteList[operation]; ok {
 			return false
 		}

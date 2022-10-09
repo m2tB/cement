@@ -8,27 +8,27 @@ import "validate/validate.proto";
 
 option go_package = "staff_client/api/staff_client/v1;v1";
 
-service Staff {
+service StaffClient {
 	rpc Captcha (CaptchaRequest) returns (CaptchaReply) {
 		option (google.api.http) = {
-			get: "/api/staff/captcha",
+			get: "/api/staff_client/captcha",
 		};
 	}
 	rpc Register (RegisterRequest) returns (RegisterReply) {
 		option (google.api.http) = {
-			post: "/api/staff/register",
+			post: "/api/staff_client/register",
 			body: "*",
 		};
 	}
 	rpc SignIn (SignInRequest) returns (SignInReply) {
 		option (google.api.http) = {
-			post: "/api/staff/signIn",
+			post: "/api/staff_client/signIn",
 			body: "*",
 		};
 	}
 	rpc SignOut (google.protobuf.Empty) returns (SignOutReply) {
 		option (google.api.http) = {
-			post: "/api/staff/signOut",
+			post: "/api/staff_client/signOut",
 			body: "*",
 		};
 	}

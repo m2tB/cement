@@ -4,6 +4,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	v1 "staff/api/staff/v1"
@@ -18,6 +19,7 @@ func NewGRPCServer(c *conf.Server, s *service.StaffService, logger log.Logger) *
 			recovery.Recovery(),
 			logging.Server(logger),
 			validate.Validator(),
+			tracing.Server(), // 新增 tracing
 		),
 	}
 	if c.Grpc.Network != "" {
