@@ -7,15 +7,17 @@ info:
     version: 0.0.1
 paths:
     /api/staff_client/captcha:
-        get:
+        post:
             tags:
                 - StaffClient
+            description: '----------------------------------------------staff登录相关接口-----------------------------------------------------'
             operationId: StaffClient_Captcha
-            parameters:
-                - name: mobile
-                  in: query
-                  schema:
-                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.staff_client.v1.CaptchaRequest'
+                required: true
             responses:
                 "200":
                     description: OK
@@ -23,6 +25,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.CaptchaReply'
+    /api/staff_client/readStaff:
+        get:
+            tags:
+                - StaffClient
+            description: '----------------------------------------------staff数据相关接口-----------------------------------------------------'
+            operationId: StaffClient_ReadStaff
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.ReadStaffReply'
     /api/staff_client/register:
         post:
             tags:
@@ -75,6 +96,28 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.SignOutReply'
+    /api/staff_client/updateStaff:
+        get:
+            tags:
+                - StaffClient
+            operationId: StaffClient_UpdateStaff
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.UpdateStaffReply'
 components:
     schemas:
         api.staff_client.v1.CaptchaReply:
@@ -82,6 +125,26 @@ components:
             properties:
                 exec:
                     type: boolean
+        api.staff_client.v1.CaptchaRequest:
+            type: object
+            properties:
+                mobile:
+                    type: string
+            description: '-------------------------------------------------------------------------------------------------------------------'
+        api.staff_client.v1.ReadStaffReply:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                mobile:
+                    type: string
+                name:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         api.staff_client.v1.RegisterReply:
             type: object
             properties:
@@ -116,6 +179,11 @@ components:
                 captcha:
                     type: string
         api.staff_client.v1.SignOutReply:
+            type: object
+            properties:
+                exec:
+                    type: boolean
+        api.staff_client.v1.UpdateStaffReply:
             type: object
             properties:
                 exec:

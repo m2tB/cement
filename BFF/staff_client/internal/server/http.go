@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -13,9 +12,11 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 	jwt2 "github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/handlers"
+	netHttp "net/http"
 	v1 "staff_client/api/staff_client/v1"
 	"staff_client/internal/conf"
 	"staff_client/internal/service"
+	"strings"
 )
 
 // NewHTTPServer new an HTTP server.
@@ -25,7 +26,6 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffClient
 			recovery.Recovery(),
 			// 接口访问的参数校验
 			validate.Validator(),
-			// 这里是本篇新增的
 			tracing.Server(),
 			// jwt 验证
 			selector.Server(
@@ -40,7 +40,7 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffClient
 			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
 			handlers.AllowedOrigins([]string{"*"}),
-		)),
+		), LocalHttpRequestFilter()),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))
@@ -56,6 +56,8 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, service *service.StaffClient
 	return srv
 }
 
+/*--------------------------------------------------------------------------------------------------------------------*/
+
 // NewWhiteListMatcher 设置白名单，不需要 token 验证的接口
 func NewWhiteListMatcher() selector.MatchFunc {
 	whiteList := make(map[string]struct{})
@@ -63,10 +65,50 @@ func NewWhiteListMatcher() selector.MatchFunc {
 	whiteList["/api.staff_client.v1.StaffClient/SignIn"] = struct{}{}
 	whiteList["/api.staff_client.v1.StaffClient/Register"] = struct{}{}
 	return func(ctx context.Context, operation string) bool {
-		fmt.Printf("operation - %s", operation)
 		if _, ok := whiteList[operation]; ok {
 			return false
 		}
 		return true
 	}
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+// LocalHttpRequestFilter 获取http请求的真实IP并填充到Header中
+func LocalHttpRequestFilter() http.FilterFunc {
+	return func(next netHttp.Handler) netHttp.Handler {
+		return netHttp.HandlerFunc(func(writer netHttp.ResponseWriter, req *netHttp.Request) {
+			remoteAddr := RemoteIp(req)
+			req.Header.Add("Remote-Address", remoteAddr)
+			next.ServeHTTP(writer, req)
+		})
+	}
+}
+
+// RemoteIp 获取请求中的IP
+func RemoteIp(req *netHttp.Request) string {
+	var remoteAddr string
+	// RemoteAddr
+	remoteAddr = req.RemoteAddr
+	if remoteAddr != "" {
+		return strings.Split(remoteAddr, ":")[0]
+	}
+	// ipv4
+	remoteAddr = req.Header.Get("ipv4")
+	if remoteAddr != "" {
+		return remoteAddr
+	}
+	// X-Forwarded-For
+	remoteAddr = req.Header.Get("X-Forwarded-For")
+	if remoteAddr != "" {
+		return remoteAddr
+	}
+	// X-Real-Ip
+	remoteAddr = req.Header.Get("X-Real-Ip")
+	if remoteAddr != "" {
+		return remoteAddr
+	} else {
+		remoteAddr = "127.0.0.1"
+	}
+	return remoteAddr
 }

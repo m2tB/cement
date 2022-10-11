@@ -9,9 +9,11 @@ import "validate/validate.proto";
 option go_package = "staff_client/api/staff_client/v1;v1";
 
 service StaffClient {
+	/*----------------------------------------------staff登录相关接口-----------------------------------------------------*/
 	rpc Captcha (CaptchaRequest) returns (CaptchaReply) {
 		option (google.api.http) = {
-			get: "/api/staff_client/captcha",
+			post: "/api/staff_client/captcha",
+			body: "*",
 		};
 	}
 	rpc Register (RegisterRequest) returns (RegisterReply) {
@@ -32,8 +34,21 @@ service StaffClient {
 			body: "*",
 		};
 	}
+
+	/*----------------------------------------------staff数据相关接口-----------------------------------------------------*/
+	rpc ReadStaff (ReadStaffRequest) returns (ReadStaffReply) {
+		option (google.api.http) = {
+			get: "/api/staff_client/readStaff",
+		};
+	}
+	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply) {
+		option (google.api.http) = {
+			get: "/api/staff_client/updateStaff",
+		};
+	}
 }
 
+/*-------------------------------------------------------------------------------------------------------------------*/
 message CaptchaRequest{
 	string mobile = 1 [(validate.rules).string.pattern = "^0?(13|14|15|17|18|19)[0-9]{9}$"]; // 手机号码
 }
@@ -63,4 +78,24 @@ message SignInReply{
 
 message SignOutReply{
 	bool exec = 1; // 执行结果
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+message ReadStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+}
+message ReadStaffReply {
+	int64 id = 1;
+	string mobile = 2;
+	string name = 3;
+	string createdAt = 4;
+	string updatedAt = 5;
+}
+
+message UpdateStaffRequest {
+	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
+	string name = 2 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+}
+message UpdateStaffReply {
+	bool exec = 1;
 }

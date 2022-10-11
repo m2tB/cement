@@ -23,10 +23,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StaffClientClient interface {
+	// ----------------------------------------------staff登录相关接口-----------------------------------------------------
 	Captcha(ctx context.Context, in *CaptchaRequest, opts ...grpc.CallOption) (*CaptchaReply, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInReply, error)
 	SignOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SignOutReply, error)
+	// ----------------------------------------------staff数据相关接口-----------------------------------------------------
+	ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error)
+	UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*UpdateStaffReply, error)
 }
 
 type staffClientClient struct {
@@ -73,14 +77,36 @@ func (c *staffClientClient) SignOut(ctx context.Context, in *emptypb.Empty, opts
 	return out, nil
 }
 
+func (c *staffClientClient) ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error) {
+	out := new(ReadStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/ReadStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *staffClientClient) UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*UpdateStaffReply, error) {
+	out := new(UpdateStaffReply)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/UpdateStaff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StaffClientServer is the server API for StaffClient service.
 // All implementations must embed UnimplementedStaffClientServer
 // for forward compatibility
 type StaffClientServer interface {
+	// ----------------------------------------------staff登录相关接口-----------------------------------------------------
 	Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	SignIn(context.Context, *SignInRequest) (*SignInReply, error)
 	SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error)
+	// ----------------------------------------------staff数据相关接口-----------------------------------------------------
+	ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error)
+	UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error)
 	mustEmbedUnimplementedStaffClientServer()
 }
 
@@ -99,6 +125,12 @@ func (UnimplementedStaffClientServer) SignIn(context.Context, *SignInRequest) (*
 }
 func (UnimplementedStaffClientServer) SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignOut not implemented")
+}
+func (UnimplementedStaffClientServer) ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadStaff not implemented")
+}
+func (UnimplementedStaffClientServer) UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStaff not implemented")
 }
 func (UnimplementedStaffClientServer) mustEmbedUnimplementedStaffClientServer() {}
 
@@ -185,6 +217,42 @@ func _StaffClient_SignOut_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StaffClient_ReadStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffClientServer).ReadStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff_client.v1.StaffClient/ReadStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffClientServer).ReadStaff(ctx, req.(*ReadStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StaffClient_UpdateStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStaffRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffClientServer).UpdateStaff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff_client.v1.StaffClient/UpdateStaff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffClientServer).UpdateStaff(ctx, req.(*UpdateStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // StaffClient_ServiceDesc is the grpc.ServiceDesc for StaffClient service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,6 +275,14 @@ var StaffClient_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SignOut",
 			Handler:    _StaffClient_SignOut_Handler,
+		},
+		{
+			MethodName: "ReadStaff",
+			Handler:    _StaffClient_ReadStaff_Handler,
+		},
+		{
+			MethodName: "UpdateStaff",
+			Handler:    _StaffClient_UpdateStaff_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

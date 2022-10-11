@@ -21,29 +21,35 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationStaffClientCaptcha = "/api.staff_client.v1.StaffClient/Captcha"
+const OperationStaffClientReadStaff = "/api.staff_client.v1.StaffClient/ReadStaff"
 const OperationStaffClientRegister = "/api.staff_client.v1.StaffClient/Register"
 const OperationStaffClientSignIn = "/api.staff_client.v1.StaffClient/SignIn"
 const OperationStaffClientSignOut = "/api.staff_client.v1.StaffClient/SignOut"
+const OperationStaffClientUpdateStaff = "/api.staff_client.v1.StaffClient/UpdateStaff"
 
 type StaffClientHTTPServer interface {
 	Captcha(context.Context, *CaptchaRequest) (*CaptchaReply, error)
+	ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error)
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	SignIn(context.Context, *SignInRequest) (*SignInReply, error)
 	SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error)
+	UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error)
 }
 
 func RegisterStaffClientHTTPServer(s *http.Server, srv StaffClientHTTPServer) {
 	r := s.Route("/")
-	r.GET("/api/staff_client/captcha", _StaffClient_Captcha0_HTTP_Handler(srv))
+	r.POST("/api/staff_client/captcha", _StaffClient_Captcha0_HTTP_Handler(srv))
 	r.POST("/api/staff_client/register", _StaffClient_Register0_HTTP_Handler(srv))
 	r.POST("/api/staff_client/signIn", _StaffClient_SignIn0_HTTP_Handler(srv))
 	r.POST("/api/staff_client/signOut", _StaffClient_SignOut0_HTTP_Handler(srv))
+	r.GET("/api/staff_client/readStaff", _StaffClient_ReadStaff0_HTTP_Handler(srv))
+	r.GET("/api/staff_client/updateStaff", _StaffClient_UpdateStaff0_HTTP_Handler(srv))
 }
 
 func _StaffClient_Captcha0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CaptchaRequest
-		if err := ctx.BindQuery(&in); err != nil {
+		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationStaffClientCaptcha)
@@ -116,11 +122,51 @@ func _StaffClient_SignOut0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http
 	}
 }
 
+func _StaffClient_ReadStaff0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ReadStaffRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationStaffClientReadStaff)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ReadStaff(ctx, req.(*ReadStaffRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ReadStaffReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _StaffClient_UpdateStaff0_HTTP_Handler(srv StaffClientHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateStaffRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationStaffClientUpdateStaff)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateStaff(ctx, req.(*UpdateStaffRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateStaffReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type StaffClientHTTPClient interface {
 	Captcha(ctx context.Context, req *CaptchaRequest, opts ...http.CallOption) (rsp *CaptchaReply, err error)
+	ReadStaff(ctx context.Context, req *ReadStaffRequest, opts ...http.CallOption) (rsp *ReadStaffReply, err error)
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
 	SignIn(ctx context.Context, req *SignInRequest, opts ...http.CallOption) (rsp *SignInReply, err error)
 	SignOut(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *SignOutReply, err error)
+	UpdateStaff(ctx context.Context, req *UpdateStaffRequest, opts ...http.CallOption) (rsp *UpdateStaffReply, err error)
 }
 
 type StaffClientHTTPClientImpl struct {
@@ -134,8 +180,21 @@ func NewStaffClientHTTPClient(client *http.Client) StaffClientHTTPClient {
 func (c *StaffClientHTTPClientImpl) Captcha(ctx context.Context, in *CaptchaRequest, opts ...http.CallOption) (*CaptchaReply, error) {
 	var out CaptchaReply
 	pattern := "/api/staff_client/captcha"
-	path := binding.EncodeURL(pattern, in, true)
+	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationStaffClientCaptcha))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *StaffClientHTTPClientImpl) ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...http.CallOption) (*ReadStaffReply, error) {
+	var out ReadStaffReply
+	pattern := "/api/staff_client/readStaff"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationStaffClientReadStaff))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -177,6 +236,19 @@ func (c *StaffClientHTTPClientImpl) SignOut(ctx context.Context, in *emptypb.Emp
 	opts = append(opts, http.Operation(OperationStaffClientSignOut))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *StaffClientHTTPClientImpl) UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...http.CallOption) (*UpdateStaffReply, error) {
+	var out UpdateStaffReply
+	pattern := "/api/staff_client/updateStaff"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationStaffClientUpdateStaff))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
