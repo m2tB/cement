@@ -25,18 +25,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.CaptchaReply'
+    /api/staff_client/listStaffTeam:
+        post:
+            tags:
+                - StaffClient
+            description: '----------------------------------------------team数据相关接口------------------------------------------------------'
+            operationId: StaffClient_ListStaffTeam
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.staff_client.v1.ListStaffTeamRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.staff_client.v1.ListStaffTeamReply'
     /api/staff_client/readStaff:
-        get:
+        post:
             tags:
                 - StaffClient
             description: '----------------------------------------------staff数据相关接口-----------------------------------------------------'
             operationId: StaffClient_ReadStaff
-            parameters:
-                - name: id
-                  in: query
-                  schema:
-                    type: integer
-                    format: int64
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
             responses:
                 "200":
                     description: OK
@@ -97,20 +114,16 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/api.staff_client.v1.SignOutReply'
     /api/staff_client/updateStaff:
-        get:
+        post:
             tags:
                 - StaffClient
             operationId: StaffClient_UpdateStaff
-            parameters:
-                - name: id
-                  in: query
-                  schema:
-                    type: integer
-                    format: int64
-                - name: name
-                  in: query
-                  schema:
-                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.staff_client.v1.UpdateStaffRequest'
+                required: true
             responses:
                 "200":
                     description: OK
@@ -130,6 +143,26 @@ components:
             properties:
                 mobile:
                     type: string
+            description: '-------------------------------------------------------------------------------------------------------------------'
+        api.staff_client.v1.ListStaffTeamReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int32
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.staff_client.v1.StaffTeamReply'
+        api.staff_client.v1.ListStaffTeamRequest:
+            type: object
+            properties:
+                pn:
+                    type: integer
+                    format: int32
+                pSize:
+                    type: integer
+                    format: int32
             description: '-------------------------------------------------------------------------------------------------------------------'
         api.staff_client.v1.ReadStaffReply:
             type: object
@@ -183,10 +216,25 @@ components:
             properties:
                 exec:
                     type: boolean
+        api.staff_client.v1.StaffTeamReply:
+            type: object
+            properties:
+                tid:
+                    type: integer
+                    format: int64
+                tName:
+                    type: string
+                createdAt:
+                    type: string
         api.staff_client.v1.UpdateStaffReply:
             type: object
             properties:
                 exec:
                     type: boolean
+        api.staff_client.v1.UpdateStaffRequest:
+            type: object
+            properties:
+                name:
+                    type: string
 tags:
     - name: StaffClient

@@ -29,8 +29,10 @@ type StaffClientClient interface {
 	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInReply, error)
 	SignOut(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SignOutReply, error)
 	// ----------------------------------------------staff数据相关接口-----------------------------------------------------
-	ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error)
+	ReadStaff(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ReadStaffReply, error)
 	UpdateStaff(ctx context.Context, in *UpdateStaffRequest, opts ...grpc.CallOption) (*UpdateStaffReply, error)
+	// ----------------------------------------------team数据相关接口------------------------------------------------------
+	ListStaffTeam(ctx context.Context, in *ListStaffTeamRequest, opts ...grpc.CallOption) (*ListStaffTeamReply, error)
 }
 
 type staffClientClient struct {
@@ -77,7 +79,7 @@ func (c *staffClientClient) SignOut(ctx context.Context, in *emptypb.Empty, opts
 	return out, nil
 }
 
-func (c *staffClientClient) ReadStaff(ctx context.Context, in *ReadStaffRequest, opts ...grpc.CallOption) (*ReadStaffReply, error) {
+func (c *staffClientClient) ReadStaff(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ReadStaffReply, error) {
 	out := new(ReadStaffReply)
 	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/ReadStaff", in, out, opts...)
 	if err != nil {
@@ -95,6 +97,15 @@ func (c *staffClientClient) UpdateStaff(ctx context.Context, in *UpdateStaffRequ
 	return out, nil
 }
 
+func (c *staffClientClient) ListStaffTeam(ctx context.Context, in *ListStaffTeamRequest, opts ...grpc.CallOption) (*ListStaffTeamReply, error) {
+	out := new(ListStaffTeamReply)
+	err := c.cc.Invoke(ctx, "/api.staff_client.v1.StaffClient/ListStaffTeam", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StaffClientServer is the server API for StaffClient service.
 // All implementations must embed UnimplementedStaffClientServer
 // for forward compatibility
@@ -105,8 +116,10 @@ type StaffClientServer interface {
 	SignIn(context.Context, *SignInRequest) (*SignInReply, error)
 	SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error)
 	// ----------------------------------------------staff数据相关接口-----------------------------------------------------
-	ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error)
+	ReadStaff(context.Context, *emptypb.Empty) (*ReadStaffReply, error)
 	UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error)
+	// ----------------------------------------------team数据相关接口------------------------------------------------------
+	ListStaffTeam(context.Context, *ListStaffTeamRequest) (*ListStaffTeamReply, error)
 	mustEmbedUnimplementedStaffClientServer()
 }
 
@@ -126,11 +139,14 @@ func (UnimplementedStaffClientServer) SignIn(context.Context, *SignInRequest) (*
 func (UnimplementedStaffClientServer) SignOut(context.Context, *emptypb.Empty) (*SignOutReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignOut not implemented")
 }
-func (UnimplementedStaffClientServer) ReadStaff(context.Context, *ReadStaffRequest) (*ReadStaffReply, error) {
+func (UnimplementedStaffClientServer) ReadStaff(context.Context, *emptypb.Empty) (*ReadStaffReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadStaff not implemented")
 }
 func (UnimplementedStaffClientServer) UpdateStaff(context.Context, *UpdateStaffRequest) (*UpdateStaffReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateStaff not implemented")
+}
+func (UnimplementedStaffClientServer) ListStaffTeam(context.Context, *ListStaffTeamRequest) (*ListStaffTeamReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListStaffTeam not implemented")
 }
 func (UnimplementedStaffClientServer) mustEmbedUnimplementedStaffClientServer() {}
 
@@ -218,7 +234,7 @@ func _StaffClient_SignOut_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _StaffClient_ReadStaff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReadStaffRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -230,7 +246,7 @@ func _StaffClient_ReadStaff_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/api.staff_client.v1.StaffClient/ReadStaff",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StaffClientServer).ReadStaff(ctx, req.(*ReadStaffRequest))
+		return srv.(StaffClientServer).ReadStaff(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -249,6 +265,24 @@ func _StaffClient_UpdateStaff_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(StaffClientServer).UpdateStaff(ctx, req.(*UpdateStaffRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StaffClient_ListStaffTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStaffTeamRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StaffClientServer).ListStaffTeam(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.staff_client.v1.StaffClient/ListStaffTeam",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StaffClientServer).ListStaffTeam(ctx, req.(*ListStaffTeamRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -283,6 +317,10 @@ var StaffClient_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateStaff",
 			Handler:    _StaffClient_UpdateStaff_Handler,
+		},
+		{
+			MethodName: "ListStaffTeam",
+			Handler:    _StaffClient_ListStaffTeam_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,11 +3,10 @@ package data
 import (
 	"context"
 	"fmt"
-	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
-	jwt2 "github.com/golang-jwt/jwt/v4"
 	v1 "staff_client/api/staff_client/v1"
 	"staff_client/internal/biz"
 	"staff_client/internal/pkg/captcha"
+	"staff_client/internal/pkg/middleware/auth"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -38,7 +37,7 @@ func NewStaffClientRepo(data *Data, logger log.Logger) biz.StaffClientRepo {
 func (r *staffClientRepo) Captcha(ctx context.Context, req *v1.CaptchaRequest) bool {
 	exec, err := r.data.rdb.Exists(ctx, LimitCaptchaPre+req.Mobile).Result()
 	if err != nil || exec > 0 {
-		r.log.WithContext(ctx).Errorf("%v 非法超频请求验证码拦截", req.Mobile)
+		r.log.WithContext(ctx).Errorf("[%v] 非法超频请求验证码拦截", req.Mobile)
 		return false
 	}
 	code := captcha.GenerateCaptcha(ctx)
@@ -59,13 +58,13 @@ func (r *staffClientRepo) Register(ctx context.Context, req *v1.RegisterRequest)
 		Name:   req.Name,
 	})
 	if err != nil {
-		r.log.WithContext(ctx).Errorf("[%v] staff服务注册接口错误: %v", req.Mobile, err)
+		r.log.WithContext(ctx).Errorf("[%v] staff服务 - staff新增接口错误: %v", req.Mobile, err)
 		return false
 	}
 	return true
 }
 
-func (r *staffClientRepo) SignIn(ctx context.Context, req *v1.SignInRequest) *biz.StaffClient {
+func (r *staffClientRepo) SignIn(ctx context.Context, req *v1.SignInRequest) *staff_v1.StaffReply {
 	exec, err := r.data.rdb.Get(ctx, LimitCaptchaPre+req.Mobile).Result()
 	if err != nil {
 		r.log.WithContext(ctx).Errorf("redis 获取 [%v] 验证码信息失败: %v", req.Mobile, err)
@@ -79,7 +78,7 @@ func (r *staffClientRepo) SignIn(ctx context.Context, req *v1.SignInRequest) *bi
 		Mobile: req.Mobile,
 	})
 	if err != nil {
-		r.log.WithContext(ctx).Errorf("[%v] staff服务列表查询接口错误: %v", req.Mobile, err)
+		r.log.WithContext(ctx).Errorf("[%v] staff服务 - staff列表查询接口错误: %v", req.Mobile, err)
 		return nil
 	}
 	if staffs.GetTotal() <= 0 {
@@ -93,23 +92,14 @@ func (r *staffClientRepo) SignIn(ctx context.Context, req *v1.SignInRequest) *bi
 		r.log.WithContext(ctx).Errorf("redis 设置 [%v] staff 登录信息失败: %v", req.Mobile, err)
 		return nil
 	}
-	return &biz.StaffClient{
-		ID:        staff.Id,
-		Mobile:    staff.Mobile,
-		Name:      staff.Name,
-		CreatedAt: staff.CreatedAt,
-		UpdatedAt: staff.UpdatedAt,
-	}
+	return staff
 }
 
 func (r *staffClientRepo) SignOut(ctx context.Context) bool {
 	// 在上下文 context 中取出 claims 对象
-	claims, ok := jwt.FromContext(ctx)
-	if !ok {
-		return false
-	}
-	claim := claims.(jwt2.MapClaims)
+	claim := auth.GetClaimFormContext(ctx)
 	if claim["ID"] == nil || claim["Mobile"] == nil {
+		r.log.WithContext(ctx).Error("ctx 获取claim数据异常, err: 无法正确提取信息字段")
 		return false
 	}
 	exec, err := r.data.rdb.ExpireAt(ctx, fmt.Sprintf("%v%v", SignMarkPre, claim["ID"]), time.Now()).Result()
@@ -121,4 +111,62 @@ func (r *staffClientRepo) SignOut(ctx context.Context) bool {
 		return false
 	}
 	return true
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+func (r *staffClientRepo) ReadStaff(ctx context.Context) *staff_v1.ReadStaffReply {
+	// 在上下文 context 中取出 claims 对象
+	claim := auth.GetClaimFormContext(ctx)
+	if claim["ID"] == nil {
+		r.log.WithContext(ctx).Error("ctx 获取claim数据异常, err: 无法正确提取信息字段")
+		return nil
+	}
+	staff, err := r.data.sc.ReadStaff(ctx, &staff_v1.ReadStaffRequest{
+		Id: claim["ID"].(int64),
+	})
+	if err != nil {
+		r.log.WithContext(ctx).Errorf("[%v] staff服务 - staff查询接口错误: %v", claim["ID"], err)
+		return nil
+	}
+	return staff
+}
+
+func (r *staffClientRepo) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) bool {
+	// 在上下文 context 中取出 claims 对象
+	claim := auth.GetClaimFormContext(ctx)
+	if claim["ID"] == nil || claim["Name"] == nil {
+		r.log.WithContext(ctx).Error("ctx 获取claim数据异常, err: 无法正确提取信息字段")
+		return false
+	}
+	exec, err := r.data.sc.UpdateStaff(ctx, &staff_v1.UpdateStaffRequest{
+		Id:   claim["ID"].(int64),
+		Name: claim["Name"].(string),
+	})
+	if err != nil {
+		r.log.WithContext(ctx).Errorf("[%v] staff服务 - staff更新接口错误: %v", claim["ID"], err)
+		return false
+	}
+	return exec.Exec
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+func (r *staffClientRepo) ListStaffTeam(ctx context.Context, req *v1.ListStaffTeamRequest) *staff_v1.ListStaffTeamReply {
+	// 在上下文 context 中取出 claims 对象
+	claim := auth.GetClaimFormContext(ctx)
+	if claim["ID"] == nil {
+		r.log.WithContext(ctx).Error("ctx 获取claim数据异常, err: 无法正确提取信息字段")
+		return nil
+	}
+	exec, err := r.data.sc.ListStaffTeam(ctx, &staff_v1.ListStaffTeamRequest{
+		Pn:    req.Pn,
+		PSize: req.PSize,
+		Sid:   claim["ID"].(int64),
+	})
+	if err != nil {
+		r.log.WithContext(ctx).Errorf("[%v] staff服务 - team与staff关系列表接口错误: %v", claim["ID"], err)
+		return nil
+	}
+	return exec
 }

@@ -36,14 +36,24 @@ service StaffClient {
 	}
 
 	/*----------------------------------------------staff数据相关接口-----------------------------------------------------*/
-	rpc ReadStaff (ReadStaffRequest) returns (ReadStaffReply) {
+	rpc ReadStaff (google.protobuf.Empty) returns (ReadStaffReply) {
 		option (google.api.http) = {
-			get: "/api/staff_client/readStaff",
+			post: "/api/staff_client/readStaff",
+			body: "*",
 		};
 	}
 	rpc UpdateStaff (UpdateStaffRequest) returns (UpdateStaffReply) {
 		option (google.api.http) = {
-			get: "/api/staff_client/updateStaff",
+			post: "/api/staff_client/updateStaff",
+			body: "*",
+		};
+	}
+
+	/*----------------------------------------------team数据相关接口------------------------------------------------------*/
+	rpc ListStaffTeam (ListStaffTeamRequest) returns (ListStaffTeamReply) {
+		option (google.api.http) = {
+			post: "/api/staff_client/listStaffTeam",
+			body: "*",
 		};
 	}
 }
@@ -93,9 +103,24 @@ message ReadStaffReply {
 }
 
 message UpdateStaffRequest {
-	int64 id = 1 [(validate.rules).int64 = {gt: 0}];
-	string name = 2 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
+	string name = 1 [(validate.rules).string = {ignore_empty: true, min_len: 2, max_len: 6}];
 }
 message UpdateStaffReply {
 	bool exec = 1;
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+message ListStaffTeamRequest {
+	int32 pn = 1 [(validate.rules).int32 = {ignore_empty: true, gte: 1}]; // 选择页
+	int32 pSize = 2 [(validate.rules).int32 = {ignore_empty: true, gte: 10}]; // 选择页列表项数量
+}
+
+message ListStaffTeamReply {
+	int32 total = 1;
+	repeated StaffTeamReply data = 2;
+}
+message StaffTeamReply {
+	int64 tid = 1;
+	string tName = 2;
+	string createdAt = 3;
 }

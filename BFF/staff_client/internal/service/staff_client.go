@@ -20,11 +20,18 @@ func (s *StaffClientService) SignOut(ctx context.Context, _ *emptypb.Empty) (*v1
 	return s.uc.SignOut(ctx)
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------------------------*/
 
-//func (s *StaffClientService) ReadStaff(ctx context.Context, req *v1.ReadStaffRequest) (*v1.ReadStaffReply, error) {
-//	return s.uc.ReadStaff(ctx, req)
-//}
-//func (s *StaffClientService) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
-//	return s.uc.UpdateStaff(ctx, req)
-//}
+func (s *StaffClientService) ReadStaff(ctx context.Context, _ *emptypb.Empty) (*v1.ReadStaffReply, error) {
+	return s.uc.ReadStaff(ctx)
+}
+
+func (s *StaffClientService) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
+	return s.uc.UpdateStaff(ctx, req)
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+func (s *StaffClientService) ListStaffTeam(ctx context.Context, req *v1.ListStaffTeamRequest) (*v1.ListStaffTeamReply, error) {
+	return s.uc.ListStaffTeam(ctx, req)
+}

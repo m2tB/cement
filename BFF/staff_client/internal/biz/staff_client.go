@@ -4,6 +4,7 @@ import (
 	"context"
 	jwt2 "github.com/golang-jwt/jwt/v4"
 	"regexp"
+	staff_v1 "staff_client/api/staff/v1"
 	v1 "staff_client/api/staff_client/v1"
 	"staff_client/internal/conf"
 	"staff_client/internal/pkg/middleware/auth"
@@ -24,27 +25,22 @@ var (
 	ErrRegisterInvalid = errors.New("register invalid")
 	ErrSignInFailed    = errors.New("sign in failed")
 
-	ErrStaffNotFound = errors.New("staff not found")
+	ErrStaffNotFound     = errors.New("staff not found")
+	ErrStaffUpdateFailed = errors.New("staff update failed")
+	ErrProgramExec       = errors.New("program exec error")
 )
-
-// StaffClient is a StaffClient model.
-type StaffClient struct {
-	ID        int64
-	Mobile    string
-	Name      string
-	CreatedAt string
-	UpdatedAt string
-}
 
 // StaffClientRepo is a StaffClient repo.
 type StaffClientRepo interface {
 	Captcha(context.Context, *v1.CaptchaRequest) bool
 	Register(context.Context, *v1.RegisterRequest) bool
-	SignIn(context.Context, *v1.SignInRequest) *StaffClient
+	SignIn(context.Context, *v1.SignInRequest) *staff_v1.StaffReply
 	SignOut(context.Context) bool
 
-	//ReadStaff(context.Context, *v1.ReadStaffRequest) *StaffClient
-	//UpdateStaff(context.Context, *v1.UpdateStaffRequest) bool
+	ReadStaff(context.Context) *staff_v1.ReadStaffReply
+	UpdateStaff(context.Context, *v1.UpdateStaffRequest) bool
+
+	ListStaffTeam(context.Context, *v1.ListStaffTeamRequest) *staff_v1.ListStaffTeamReply
 }
 
 // StaffClientUsecase is a StaffClient usecase.
@@ -94,7 +90,7 @@ func (uc *StaffClientUsecase) SignIn(ctx context.Context, req *v1.SignInRequest)
 	}
 	// 生成token令牌
 	claims := auth.CusClaims{
-		ID:     staff.ID,
+		ID:     staff.Id,
 		Mobile: staff.Mobile,
 		Name:   staff.Name,
 		RegisteredClaims: jwt2.RegisteredClaims{
@@ -103,12 +99,12 @@ func (uc *StaffClientUsecase) SignIn(ctx context.Context, req *v1.SignInRequest)
 			Issuer:    "Staff_Client",
 		},
 	}
-	token, err := auth.CreateToken(claims, uc.signKey)
+	token, err := auth.GenerateToken(claims, uc.signKey)
 	if err != nil {
 		return nil, ErrGenerateTokenFailed
 	}
 	return &v1.SignInReply{
-		Id:        staff.ID,
+		Id:        staff.Id,
 		Name:      staff.Name,
 		Mobile:    staff.Mobile,
 		CreatedAt: staff.CreatedAt,
@@ -126,39 +122,51 @@ func (uc *StaffClientUsecase) SignOut(ctx context.Context) (*v1.SignOutReply, er
 	}, nil
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------------------------------------------*/
 
-//func (uc *StaffClientUsecase) ReadStaff(ctx context.Context, req *v1.ReadStaffRequest) (*v1.ReadStaffReply, error) {
-//	// 在上下文 context 中取出 claims 对象
-//	claims, ok := jwt.FromContext(ctx)
-//	if !ok {
-//		return nil, ErrAuthFailed
-//	}
-//	claim := claims.(jwt2.MapClaims)
-//	if claim["ID"] == nil || claim["Mobile"] == nil {
-//		return nil, ErrAuthFailed
-//	}
-//	// TODO - 删除redis登录信息
-//	return &v1.ReadStaffReply{
-//		Id:        staff.ID,
-//		Name:      staff.Name,
-//		Mobile:    staff.Mobile,
-//		CreatedAt: staff.CreatedAt,
-//		UpdatedAt: staff.UpdatedAt,
-//	}, nil
-//}
-//
-//func (uc *StaffClientUsecase) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
-//	// 在上下文 context 中取出 claims 对象
-//	claims, ok := jwt.FromContext(ctx)
-//	if !ok {
-//		return nil, ErrAuthFailed
-//	}
-//	claim := claims.(jwt2.MapClaims)
-//	if claim["ID"] == nil || claim["Mobile"] == nil {
-//		return nil, ErrAuthFailed
-//	}
-//	return &v1.UpdateStaffReply{
-//		Exec: true,
-//	}, nil
-//}
+func (uc *StaffClientUsecase) ReadStaff(ctx context.Context) (*v1.ReadStaffReply, error) {
+	staff := uc.repo.ReadStaff(ctx)
+	if staff == nil {
+		return nil, ErrStaffNotFound
+	}
+	return &v1.ReadStaffReply{
+		Id:        staff.Staff.Id,
+		Name:      staff.Staff.Name,
+		Mobile:    staff.Staff.Mobile,
+		CreatedAt: staff.Staff.CreatedAt,
+		UpdatedAt: staff.Staff.UpdatedAt,
+	}, nil
+}
+
+func (uc *StaffClientUsecase) UpdateStaff(ctx context.Context, req *v1.UpdateStaffRequest) (*v1.UpdateStaffReply, error) {
+	exec := uc.repo.UpdateStaff(ctx, req)
+	if !exec {
+		return nil, ErrStaffUpdateFailed
+	}
+	return &v1.UpdateStaffReply{
+		Exec: true,
+	}, nil
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+func (uc *StaffClientUsecase) ListStaffTeam(ctx context.Context, req *v1.ListStaffTeamRequest) (*v1.ListStaffTeamReply, error) {
+	exec := uc.repo.ListStaffTeam(ctx, req)
+	if exec == nil {
+		return nil, ErrProgramExec
+	}
+	var data []*v1.StaffTeamReply
+	if exec.Total > 0 {
+		for _, v := range exec.Data {
+			data = append(data, &v1.StaffTeamReply{
+				Tid:       v.Tid,
+				TName:     v.TName,
+				CreatedAt: v.CreatedAt,
+			})
+		}
+	}
+	return &v1.ListStaffTeamReply{
+		Total: exec.Total,
+		Data:  data,
+	}, nil
+}
